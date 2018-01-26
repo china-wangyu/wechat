@@ -40,7 +40,7 @@ class WxUser extends WxBase
      * @param  boolen  $type                         [true:获取用户信息 | false:用户openid]
      * @return [array] [用户信息|用户openid]
      */
-    public static function getOpenid($code, $appid, $appSecret, $type = true)
+    public static function getOpenid($code, $appid, $appSecret, $type = false)
     {
         empty($appid) or empty($appSecret) ? self::json(400, '请设置管理端微信公众号开发者APPID 和 APPSECRET~ !') : '';
         empty($code) ? self::json(400, '请验证是否传了正确的参数 code ~ !') : '';
@@ -58,7 +58,7 @@ class WxUser extends WxBase
 
     /**
      * [getUserinfo 获取用户信息]
-     * @param  [type] $access_token   [授权获取用户关键参数：普通access_token]
+     * @param  [type] $access_token   [授权获取用户关键参数：access_token]
      * @param  [type] $openid         [用户openid]
      * @return [type] [description]
      */

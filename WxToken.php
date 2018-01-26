@@ -22,7 +22,10 @@ class WxToken extends WxBase
 {
 
     /**
-     * [set 设置微信access_token]
+     * [getToken 获取微信access_token]
+     * @param  string   $appid                 [微信AppID]
+     * @param  string   $appSecret             [微信AppSecret]
+     * @return [string] [微信access_token]
      */
     public static function getToken($appid = '', $appSecret = '')
     {

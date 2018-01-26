@@ -20,7 +20,7 @@ class WxTicket extends WxBase
 {
 
     /**
-     * [set 设置微信jsapi_ticket]
+     * [getTicket 设置微信jsapi_ticket]
      * @param  string   $access_token          [微信普通token]
      * @return [string] [微信jsapi_ticket]
      */
