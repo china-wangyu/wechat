@@ -3,6 +3,40 @@
 
 > 本扩展功能的运行环境要求PHP5.6以上。
 
+>### 使用 `git` 安装
+
+~~~
+
+    Github ：git@github.com:china-wangyu/wechat.git
+    Coding ：git@github.com:china-wangyu/wechat.git
+    码云   ：git@github.com:china-wangyu/wechat.git
+
+~~~
+
+>### 使用 `composer`  安装
+
+~~~
+
+    由于众所周知的原因，国外的网站连接速度很慢。因此安装的时间可能会比较长，我们建议通过下面的方式使用国内镜像。
+
+    打开命令行窗口（windows用户）或控制台（Linux、Mac 用户）并执行如下命令：
+
+    composer config -g repo.packagist composer https://packagist.phpcomposer.com
+
+    使用： 在composer.json添加
+
+    "require": {
+        "china-wangyu/wechat": "^1.0"
+    },
+
+    然后(命令行)：
+
+    composer update
+
+~~~
+
+
+
 
 ## 接口使用说明
 
