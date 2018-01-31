@@ -16,8 +16,6 @@
  */
 namespace wechat;
 
-use think\Validate;
-
 class WxToken extends WxBase
 {
 
@@ -31,19 +29,13 @@ class WxToken extends WxBase
     {
         if (!isset($_SESSION['access_token']) or empty($_SESSION['access_token']) and time() - $_SESSION['access_token_time'] > 7100) {
             /****************      进行微信AppID 和 AppSecret的验证   ******************/
-            if (empty($appid) or empty($appSecret)) {
-                self::json(400, '请设置管理端微信公众号开发者APPID 和 APPSECRET~ !');
-            }
+            empty($appid) or empty($appSecret) ? self::json(400, '请设置管理端微信公众号开发者APPID 和 APPSECRET~ !') : '';
+            !is_string($appid) or !is_string($appSecret) ? self::json(400, '微信公众号开发者APPID 和 APPSECRET格式错误~ !') : '';
             /****************      获取参数验证规则      ******************/
-            $rule = [
-                'appid'     => ['require', 'alphaNum', 'length' => 18],
-                'appSecret' => ['require', 'alphaNum', 'length' => 32],
-            ];
-            $validate = new Validate($rule);
-            if ($validate->check(['appid' => $appid, 'appSecret' => $appSecret])) {
-                $access_token_url              = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . $appid . '&secret=' . $appSecret;
-                $result                        = self::curl_request($access_token_url, true);
-                $_SESSION['access_token']      = $result['access_token'];
+            if (strlen(trim($appid)) == 18 or strlen(trim($appSecret)) == 18) {
+                $access_token_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . $appid . '&secret=' . $appSecret;
+                $result = self::curl_request($access_token_url, true);
+                $_SESSION['access_token'] = $result['access_token'];
                 $_SESSION['access_token_time'] = time();
                 return $_SESSION['access_token'];
             } else {

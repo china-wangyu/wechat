@@ -40,7 +40,7 @@ abstract class WxBase
     {
         $param = [
             'code' => $code,
-            'msg'  => $msg,
+            'msg' => $msg,
             'data' => $data,
         ];
         header("HTTP/1.1 " . $code . " " . self::$STATUSCODE[$code]);
@@ -80,11 +80,30 @@ abstract class WxBase
         }
         /****************      发送请求    ******************/
         curl_setopt($ch, CURLOPT_URL, $url);
-        $result     = curl_exec($ch);
+        $result = curl_exec($ch);
         $url_status = curl_getinfo($ch);
         /****************      关闭连接 并 返回数据    ******************/
         curl_close($ch);
         return intval($url_status["http_code"]) == 200 ? json_decode($result, true) : false;
+    }
+
+    /**
+     *
+     * 拼接签名字符串
+     * @param array $urlObj
+     *
+     * @return 返回已经拼接好的字符串
+     */
+    protected static function ToUrlParams($urlObj)
+    {
+        $buff = "";
+        foreach ($urlObj as $k => $v) {
+            if ($k != "sign") {
+                $buff .= $k . "=" . $v . "&";
+            }
+        }
+        $buff = trim($buff, "&");
+        return $buff;
     }
 
 }

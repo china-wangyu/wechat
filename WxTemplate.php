@@ -38,9 +38,7 @@ class WxTemplate extends WxBase
     }
 
     /**
-     * [getTemplateAll 获取所有消息模板内容]
-     * @param  string $accessToken    [description]
-     * @return [type] [description]
+     * 10
      */
     public static function getTemplateAll($accessToken = '')
     {
