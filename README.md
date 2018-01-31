@@ -238,6 +238,57 @@ wechat         模块目录
 
 ~~~
 
+## 二维码 `Qrcode`
+
+### 生成二维码文件 `file`
+
+~~~
+
+     * [file 生成二维码文件]
+     * @param  string $fileDir [文件目录]
+     * @param  string $url      [二维码网址]
+     * @param  array  $param    [二维码参数]
+     * @return [string]           [二维码地址]
+
+    \wechat\Qrcode::file($fileDir = '', $url = '', $param = []);
+
+
+
+~~~
+
+### 生成二维码链接 `url`
+
+~~~
+
+     * [url 生成二维码链接]
+     * @param  [type] $url    [二维码网址]
+     * @param  array  $param  [二维码参数]
+     * @param  string $width  [二维码宽度]
+     * @param  string $height [二维码高度]
+     * @return [string]         [参数加密后的二维码链接]
+
+    \wechat\Qrcode::url($url = '', $param = [], $width = '300', $height = '300');
+
+
+
+~~~
+
+### 生成二维码 `<img>` 标签  `url`
+
+~~~
+
+     * [html 生成二维码html <img src=''> 标签]
+     * @param  [type] $url    [二维码网址]
+     * @param  array  $param  [二维码参数]
+     * @param  string $width  [二维码宽度]
+     * @param  string $height [二维码高度]
+     * @return [string]         [二维码<img src=''> 标签]
+
+    \wechat\Qrcode::html($url = '', $param = [], $width = '300', $height = '300');
+
+
+
+~~~
 
 
 >| 注：如有疑问，请联系邮箱 china_wangyu@aliyun.com
