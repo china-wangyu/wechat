@@ -40,7 +40,7 @@ abstract class WxBase
     {
         $param = [
             'code' => $code,
-            'msg' => $msg,
+            'msg'  => $msg,
             'data' => $data,
         ];
         header("HTTP/1.1 " . $code . " " . self::$STATUSCODE[$code]);
@@ -80,7 +80,7 @@ abstract class WxBase
         }
         /****************      发送请求    ******************/
         curl_setopt($ch, CURLOPT_URL, $url);
-        $result = curl_exec($ch);
+        $result     = curl_exec($ch);
         $url_status = curl_getinfo($ch);
         /****************      关闭连接 并 返回数据    ******************/
         curl_close($ch);

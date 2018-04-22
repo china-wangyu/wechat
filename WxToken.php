@@ -33,9 +33,9 @@ class WxToken extends WxBase
             !is_string($appid) or !is_string($appSecret) ? self::json(400, '微信公众号开发者APPID 和 APPSECRET格式错误~ !') : '';
             /****************      获取参数验证规则      ******************/
             if (strlen(trim($appid)) == 18 or strlen(trim($appSecret)) == 18) {
-                $access_token_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . $appid . '&secret=' . $appSecret;
-                $result = self::curl_request($access_token_url, true);
-                $_SESSION['access_token'] = $result['access_token'];
+                $access_token_url              = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . $appid . '&secret=' . $appSecret;
+                $result                        = self::curl_request($access_token_url, true);
+                $_SESSION['access_token']      = $result['access_token'];
                 $_SESSION['access_token_time'] = time();
                 return $_SESSION['access_token'];
             } else {

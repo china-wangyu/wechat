@@ -28,101 +28,100 @@ class WxSend extends WxBase
     public static function sendKeyWord($paramObj = [], $postObj = [], $template = false)
     {
         empty($paramObj) or empty($postObj) ? self::json(400, '请设置正确的参数 $paramObj or $postObj~ !') : '';
-    }
-    $templateString = self::getKeyWordTemplate($template);
-    $fromUsername = $postObj->FromUserName;
-    $toUsername = $postObj->ToUserName;
-    $time = time();
-    switch ($template) {
-        case true:
-            if (empty($paramObj['title']) or empty($paramObj['content']) or empty($paramObj['imgurl']) or empty($paramObj['jumpurl'])) {
-                self::json(400, '请设置正确的参数值~!');
-            }
-            $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, $paramObj['title'], $paramObj['content'], $paramObj['imgurl'], $paramObj['jumpurl']);
-            break;
-        case false:
-            if (empty($paramObj['content'])) {
-                self::json(400, '请设置正确的参数值~!');
-            }
-            $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, 'text', $paramObj['content']);
-            break;
+        $templateString = self::getKeyWordTemplate($template);
+        $fromUsername   = $postObj->FromUserName;
+        $toUsername     = $postObj->ToUserName;
+        $time           = time();
+        switch ($template) {
+            case true:
+                if (empty($paramObj['title']) or empty($paramObj['content']) or empty($paramObj['imgurl']) or empty($paramObj['jumpurl'])) {
+                    self::json(400, '请设置正确的参数值~!');
+                }
+                $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, $paramObj['title'], $paramObj['content'], $paramObj['imgurl'], $paramObj['jumpurl']);
+                break;
+            case false:
+                if (empty($paramObj['content'])) {
+                    self::json(400, '请设置正确的参数值~!');
+                }
+                $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, 'text', $paramObj['content']);
+                break;
+        }
+
+        echo $resultStr;
     }
 
-    echo $resultStr;
-}
+    /**
+     * [sendMsg 发送模板消息]
+     * @param  string $templateid [模板ID]
+     * @param  string $openid     [用户openid]
+     * @param  array  $data       [模板参数]
+     * @param  string $url        [模板消息链接]
+     * @param  string $topcolor   [微信top颜色]
+     * @return [ajax] [boolen]
+     */
+    public function sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000')
+    {
+        /****************      验证微信普通token   ******************/
+        if (empty($accessToken)) {
+            $accessToken = WxToken::getToken();
+        }
+        empty($data) or empty($openid) or empty($templateid) ? self::json(400, '请设置正确的参数 $template or $value~ !') : '';
 
-/**
- * [sendMsg 发送模板消息]
- * @param  string $templateid [模板ID]
- * @param  string $openid     [用户openid]
- * @param  array  $data       [模板参数]
- * @param  string $url        [模板消息链接]
- * @param  string $topcolor   [微信top颜色]
- * @return [ajax] [boolen]
- */
-function sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000')
-{
-    /****************      验证微信普通token   ******************/
-    if (empty($accessToken)) {
-        $accessToken = WxToken::getToken();
+        $template['template_id'] = $templateid;
+        $template['touser']      = $openid;
+        $template['url']         = empty($url) ? '' : $url;
+        $template['topcolor']    = empty($topcolor) ? '' : $topcolor;
+        $template['data']        = $data;
+        $send_url                = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
+        $result                  = self::curl_request($send_url, true, 'post', json_encode($template));
+        return $result;
     }
-    empty($data) or empty($openid) or empty($templateid) ? self::json(400, '请设置正确的参数 $template or $value~ !') : '';
-}
-$template['template_id'] = $templateid;
-$template['touser'] = $openid;
-$template['url'] = empty($url) ? '' : $url;
-$template['topcolor'] = empty($topcolor) ? '' : $topcolor;
-$template['data'] = $data;
-$send_url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
-$result = self::curl_request($send_url, true, 'post', json_encode($template));
-return $result;
-}
 
-/**
- * [send_menu 生成菜单]
- * 例如：$menu =[
- *     'menu_name'=> '掌上商城',
- *     'menu_status'=> 0; //0表示view
- *     'menu_url' => 'http://www.baidu.com',
- *     'chind' => [
- *         'menu_name'=> '掌上商城',
- *         'menu_status'=> 0; //0表示view
- *         'menu_url' => 'http://www.baidu.com',
- *         ],
- *     ];
- * @param  array   $menu                                  [菜单内容 ]
- * @return [array] [微信返回值：状态值数组]
- */
-    function sendMenu($accessToken = '', $menu = [])
-{
+    /**
+     * [send_menu 生成菜单]
+     * 例如：$menu =[
+     *     'menu_name'=> '掌上商城',
+     *     'menu_status'=> 0; //0表示view
+     *     'menu_url' => 'http://www.baidu.com',
+     *     'chind' => [
+     *         'menu_name'=> '掌上商城',
+     *         'menu_status'=> 0; //0表示view
+     *         'menu_url' => 'http://www.baidu.com',
+     *         ],
+     *     ];
+     * @param  array   $menu                                  [菜单内容 ]
+     * @return [array] [微信返回值：状态值数组]
+     */
+    public function sendMenu($accessToken = '', $menu = [])
+    {
         /****************      验证微信普通token   ******************/
         if (empty($accessToken)) {
             $accessToken = WxToken::getToken();
         }
         !is_array($menu) or count($menu) == 0 ? self::json(400, '请设置正确的参数 $menu ~ !') : '';
         $format_param['button'] = self::format_param($menu);
-        $send_url = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $accessToken;
-        $result = self::curl_request($send_url, true, 'post', json_encode($format_param, JSON_UNESCAPED_UNICODE));
+        $send_url               = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $accessToken;
+        $result                 = self::curl_request($send_url, true, 'post', json_encode($format_param, JSON_UNESCAPED_UNICODE));
         return $result;
     }
 
-/**
- * [format_param 格式化菜单数组]
- * @param  [array] $menu      [数组]
- * @return [array] [数组]
- */
-    function format_param($menu)
-{
+    /**
+     * [format_param 格式化菜单数组]
+     * @param  [array] $menu      [数组]
+     * @return [array] [数组]
+     */
+    public function format_param($menu)
+    {
         $button = [];
         foreach ($menu as $key => $val) {
             $button[$key]['name'] = $val['menu_name'];
             if (empty($val['chind'])) {
-                $button[$key]['type'] = $val['menu_status'] == 0 ? 'view' : 'click';
+                $button[$key]['type']                                   = $val['menu_status'] == 0 ? 'view' : 'click';
                 $button[$key][$val['menu_status'] == 0 ? 'url' : 'key'] = $val['menu_url'];
             } else {
                 foreach ($val['chind'] as $chind => $value) {
-                    $button[$key]['sub_button'][$chind]['name'] = $value['menu_name'];
-                    $button[$key]['sub_button'][$chind]['type'] = $value['menu_status'] == 0 ? 'view' : 'click';
+                    $button[$key]['sub_button'][$chind]['name']                                     = $value['menu_name'];
+                    $button[$key]['sub_button'][$chind]['type']                                     = $value['menu_status'] == 0 ? 'view' : 'click';
                     $button[$key]['sub_button'][$chind][$chind['menu_status'] == 0 ? 'url' : 'key'] = $value['menu_url'];
                 }
             }
@@ -130,13 +129,13 @@ return $result;
         return $button;
     }
 
-/**
- * [getKeyWordTemplate 获取模板关键字模板]
- * @param  boolean  $type            [图文：true | 文本： false]
- * @return [string] [模板内容]
- */
-    function getKeyWordTemplate($type = true)
-{
+    /**
+     * [getKeyWordTemplate 获取模板关键字模板]
+     * @param  boolean  $type            [图文：true | 文本： false]
+     * @return [string] [模板内容]
+     */
+    public function getKeyWordTemplate($type = true)
+    {
         switch ($type) {
             case true:
                 $imageTpl = "<xml>

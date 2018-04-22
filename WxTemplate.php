@@ -38,9 +38,11 @@ class WxTemplate extends WxBase
     }
 
     /**
-     * 10
+     * [getAllTemplate 获取所有消息模板内容]
+     * @param  string $accessToken    [微信token]
+     * @return [type] [description]
      */
-    public static function getTemplateAll($accessToken = '')
+    public static function getAllTemplate($accessToken = '')
     {
         /****************      验证微信普通token   ******************/
         if (empty($accessToken)) {
@@ -56,6 +58,8 @@ class WxTemplate extends WxBase
 
     /**
      * [trim_template 获取模板需要的参数name]
+     * @param  [type] $string [过滤包含参数的字符串]
+     * @return [type]         [不带其它字符的参数数组]
      */
     private static function trim_template($string)
     {

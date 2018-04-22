@@ -164,15 +164,15 @@ wechat         模块目录
 
 ## 微信Template
 
-### 微信 `getTemplateAll`
+### 微信 `getAllTemplate`
 
 ~~~
 
-    * [getTemplateAll 获取所有消息模板内容]
+    * [getAllTemplate 获取所有消息模板内容]
     * @param  string $accessToken    [微信token]
     * @return [type] [description]
 
-    \wechat\WxTemplate::getTemplateAll('微信token');
+    \wechat\WxTemplate::getAllTemplate('微信token');
 
 ~~~
 
