@@ -11,7 +11,7 @@
  *
  *  联系方式：china_wangyu@aliyun.com
  * @date    2018-01-31 17:13:04
- * @version 1.0
+ * @version 1.0.2
  * @authors wene (china_wangyu@aliyun.com)
  */
 namespace wechat;
@@ -30,11 +30,11 @@ class Qrcode extends WxBase
      */
     public static function file($fileDir = '', $url = '', $param = [])
     {
-        empty($fileDir) ? self::json(400, '@ 文件路径不能为空~！') : '';
+        empty($fileDir) && \wechat\lib\Abnormal::error('文件路径不能为空~！');
         is_dir($fileDir) ? '' : mkdir($fileDir, 0755);
         if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%
     =~_|]/i", $url)) {
-            self::json(400, '@ URL格式不正确~！');
+            \wechat\lib\Abnormal::error('URL格式不正确~！');
         }
         $filepath = $fileDir . '/' . time() . '.jpg';
         switch ($param) {
@@ -60,17 +60,10 @@ class Qrcode extends WxBase
     {
         if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%
     =~_|]/i", $url)) {
-            self::json(400, '@ URL格式不正确~！');
+            \wechat\lib\Abnormal::error('URL格式不正确~！');
         }
-        switch ($param) {
-            case count($param) == 0 or !is_array($param):
-                break;
-            default:
-                $url .= '?' . self::ToUrlParams($param);
-                break;
-        }
-        $imgUrl = 'http://pan.baidu.com/share/qrcode?w=' . $width . '&h=' . $height . '&url=' . urlencode($url);
-        return $imgUrl;
+        is_array($param) && $url .= '?' . self::ToUrlParams($param);
+        return 'http://pan.baidu.com/share/qrcode?w=' . $width . '&h=' . $height . '&url=' . urlencode($url);
     }
 
     /**
@@ -85,17 +78,10 @@ class Qrcode extends WxBase
     {
         if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%
     =~_|]/i", $url)) {
-            self::json(400, '@ URL格式不正确~！');
+            \wechat\lib\Abnormal::error('URL格式不正确~！');
         }
-        switch ($param) {
-            case count($param) == 0 or !is_array($param):
-                break;
-            default:
-                $url .= '?' . self::ToUrlParams($param);
-                break;
-        }
-        $imgDiv = '<img alt="二维码" src="http://pan.baidu.com/share/qrcode?w=' . $width . '&h=' . $height . '&url=' . urlencode($url) . ' />"';
-        return $imgDiv;
+        is_array($param) && $url .= '?' . self::ToUrlParams($param);
+        return '<img alt="二维码" src="http://pan.baidu.com/share/qrcode?w=' . $width . '&h=' . $height . '&url=' . urlencode($url) . ' />"';
     }
 
 }

@@ -1,5 +1,10 @@
 <?php
 /**
+ * 微信用户类
+ * @authors china_wangyu (china_wangyu@aliyun.com)
+ * @date    2018-04-22 16:36:00
+ * @version 1.0.2
+ *
  *  ** 求职区 **
  *  期望城市： 成都
  *  期望薪资： 8k - 12k
@@ -10,9 +15,6 @@
  *  开发语言: PHP / Python
  *
  *  联系方式：china_wangyu@aliyun.com
- * @date    2018-01-23 17:13:04
- * @version 1.0
- * @authors wene (china_wangyu@aliyun.com)
  */
 namespace wechat;
 
@@ -26,8 +28,9 @@ class WxUser extends WxBase
      */
     public static function code($appid = '')
     {
-        empty($appid) ? self::json(400, '请设置管理端微信公众号开发者APPID ~ !') : '';
-        $service_url     = urlencode('https://' . $_SERVER['SERVER_NAME'] . $_SERVER["REQUEST_URI"]);
+        empty($appid) && \wechat\lib\Abnormal::error('请设置管理端微信公众号开发者APPID ~ !');
+        //当前域名
+        $service_url     = urlencode($_SERVER['REQUEST_SCHEME'] . '//' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
         $weixin_code_url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $appid . '&redirect_uri=' . $service_url . '&response_type=code&scope=snsapi_userinfo&state=state&connect_redirect=1#wechat_redirect';
         header('location: ' . $weixin_code_url);
     }
@@ -42,18 +45,14 @@ class WxUser extends WxBase
      */
     public static function getOpenid($code, $appid, $appSecret, $type = false)
     {
-        empty($appid) or empty($appSecret) ? self::json(400, '请设置管理端微信公众号开发者APPID 和 APPSECRET~ !') : '';
-        empty($code) ? self::json(400, '请验证是否传了正确的参数 code ~ !') : '';
+        //验证参数
+        (empty($appid) or empty($appSecret)) && \wechat\lib\Abnormal::error('请设置管理端微信公众号开发者APPID 和 APPSECRET~ !');
+        empty($code) && \wechat\lib\Abnormal::error('请验证是否传了正确的参数 code ~ !');
+        //获取用户数据
         $weixin_oauth2_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' . $appid . '&secret=' . $appSecret . '&code=' . $code . '&grant_type=authorization_code';
         $result            = self::curl_request($weixin_oauth2_url, true);
-        switch ($type) {
-            case true:
-                return self::getUserinfo($result['access_token'], $result['openid']);
-                break;
-            case false:
-                return $result;
-                break;
-        }
+
+        return $type == false ? $result : self::getUserinfo($result['access_token'], $result['openid']);
     }
 
     /**
@@ -64,10 +63,9 @@ class WxUser extends WxBase
      */
     public static function getUserinfo($access_token, $openid)
     {
-        empty($access_token) or empty($openid) ? self::json(400, 'getOpenid()方法设置参数~ !') : '';
+        (empty($access_token) or empty($openid)) && \wechat\lib\Abnormal::error('getOpenid()方法设置参数~ !');
         $weixin_userinfo = 'https://api.weixin.qq.com/sns/userinfo?access_token=' . $access_token . '&openid=' . $openid . '&lang=zh_CN';
-        $result          = self::curl_request($weixin_userinfo, true);
-        return $result;
+        return self::curl_request($weixin_userinfo, true);
     }
 
 }

@@ -1,5 +1,10 @@
 <?php
 /**
+ * 微信模板类
+ * @authors china_wangyu (china_wangyu@aliyun.com)
+ * @date    2018-04-22 16:36:00
+ * @version 1.0.2
+ *
  *  ** 求职区 **
  *  期望城市： 成都
  *  期望薪资： 8k - 12k
@@ -10,9 +15,6 @@
  *  开发语言: PHP / Python
  *
  *  联系方式：china_wangyu@aliyun.com
- * @date    2018-01-23 17:13:04
- * @version 1.0
- * @authors wene (china_wangyu@aliyun.com)
  */
 namespace wechat;
 
@@ -45,11 +47,9 @@ class WxTemplate extends WxBase
     public static function getAllTemplate($accessToken = '')
     {
         /****************      验证微信普通token   ******************/
-        if (empty($accessToken)) {
-            $accessToken = WxToken::getToken();
-        }
-        $template_url = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=' . $accessToken;
-        $result       = self::curl_request($template_url, true);
+        empty($accessToken) && $accessToken = WxToken::getToken();
+        $template_url                       = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=' . $accessToken;
+        $result                             = self::curl_request($template_url, true);
         foreach ($result['template_list'] as $key) {
             $templateObj[] = self::initTemplate($key);
         }

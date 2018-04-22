@@ -1,5 +1,10 @@
 <?php
 /**
+ * 微信推送类
+ * @authors china_wangyu (china_wangyu@aliyun.com)
+ * @date    2018-04-22 16:36:00
+ * @version 1.0.2
+ *
  *  ** 求职区 **
  *  期望城市： 成都
  *  期望薪资： 8k - 12k
@@ -10,9 +15,6 @@
  *  开发语言: PHP / Python
  *
  *  联系方式：china_wangyu@aliyun.com
- * @date    2018-01-23 17:13:04
- * @version 1.0
- * @authors wene (china_wangyu@aliyun.com)
  */
 namespace wechat;
 
@@ -25,9 +27,9 @@ class WxSend extends WxBase
      * @param  boolean         $template       [关键字模板 图文：true | 文本： false]
      * @return [string|boolen] [description]
      */
-    public static function sendKeyWord($paramObj = [], $postObj = [], $template = false)
+    public static function sendKeyWord(array $paramObj = [], $postObj = [], $template = false)
     {
-        empty($paramObj) or empty($postObj) ? self::json(400, '请设置正确的参数 $paramObj or $postObj~ !') : '';
+        (empty($paramObj) or empty($postObj)) && \wechat\lib\Abnormal::error('请设置正确的参数 $paramObj or $postObj~ !');
         $templateString = self::getKeyWordTemplate($template);
         $fromUsername   = $postObj->FromUserName;
         $toUsername     = $postObj->ToUserName;
@@ -35,14 +37,13 @@ class WxSend extends WxBase
         switch ($template) {
             case true:
                 if (empty($paramObj['title']) or empty($paramObj['content']) or empty($paramObj['imgurl']) or empty($paramObj['jumpurl'])) {
-                    self::json(400, '请设置正确的参数值~!');
+                    \wechat\lib\Abnormal::error('请设置正确的参数值~!');
                 }
                 $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, $paramObj['title'], $paramObj['content'], $paramObj['imgurl'], $paramObj['jumpurl']);
                 break;
             case false:
-                if (empty($paramObj['content'])) {
-                    self::json(400, '请设置正确的参数值~!');
-                }
+                empty($paramObj['content']) && \wechat\lib\Abnormal::error('请设置正确的参数值~!');
+
                 $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, 'text', $paramObj['content']);
                 break;
         }
@@ -59,13 +60,11 @@ class WxSend extends WxBase
      * @param  string $topcolor   [微信top颜色]
      * @return [ajax] [boolen]
      */
-    public function sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000')
+    public static function sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000')
     {
         /****************      验证微信普通token   ******************/
-        if (empty($accessToken)) {
-            $accessToken = WxToken::getToken();
-        }
-        empty($data) or empty($openid) or empty($templateid) ? self::json(400, '请设置正确的参数 $template or $value~ !') : '';
+        empty($accessToken) && $accessToken = WxToken::getToken();
+        (empty($data) or empty($openid) or empty($templateid)) && \wechat\lib\Abnormal::error('请设置正确的参数 $template or $value~ !');
 
         $template['template_id'] = $templateid;
         $template['touser']      = $openid;
@@ -73,8 +72,7 @@ class WxSend extends WxBase
         $template['topcolor']    = empty($topcolor) ? '' : $topcolor;
         $template['data']        = $data;
         $send_url                = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
-        $result                  = self::curl_request($send_url, true, 'post', json_encode($template));
-        return $result;
+        return self::curl_request($send_url, true, 'post', json_encode($template));
     }
 
     /**
@@ -92,17 +90,15 @@ class WxSend extends WxBase
      * @param  array   $menu                                  [菜单内容 ]
      * @return [array] [微信返回值：状态值数组]
      */
-    public function sendMenu($accessToken = '', $menu = [])
+    public static function sendMenu($accessToken = '', $menu = [])
     {
         /****************      验证微信普通token   ******************/
-        if (empty($accessToken)) {
-            $accessToken = WxToken::getToken();
-        }
-        !is_array($menu) or count($menu) == 0 ? self::json(400, '请设置正确的参数 $menu ~ !') : '';
+        empty($accessToken) && $accessToken = WxToken::getToken();
+        (!is_array($menu) or count($menu) == 0) && \wechat\lib\Abnormal::error('请设置正确的参数 $menu ~ !');
+
         $format_param['button'] = self::format_param($menu);
         $send_url               = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $accessToken;
-        $result                 = self::curl_request($send_url, true, 'post', json_encode($format_param, JSON_UNESCAPED_UNICODE));
-        return $result;
+        return self::curl_request($send_url, true, 'post', json_encode($format_param, JSON_UNESCAPED_UNICODE));
     }
 
     /**
@@ -110,7 +106,7 @@ class WxSend extends WxBase
      * @param  [array] $menu      [数组]
      * @return [array] [数组]
      */
-    public function format_param($menu)
+    private static function format_param($menu)
     {
         $button = [];
         foreach ($menu as $key => $val) {
@@ -134,11 +130,11 @@ class WxSend extends WxBase
      * @param  boolean  $type            [图文：true | 文本： false]
      * @return [string] [模板内容]
      */
-    public function getKeyWordTemplate($type = true)
+    private static function getKeyWordTemplate($type = true)
     {
         switch ($type) {
-            case true:
-                $imageTpl = "<xml>
+            case true: // true : 图文
+                return "<xml>
                   <ToUserName><![CDATA[%s]]></ToUserName>
                   <FromUserName><![CDATA[%s]]></FromUserName>
                   <CreateTime>%s</CreateTime>
@@ -153,11 +149,10 @@ class WxSend extends WxBase
                   </item>
                   </Articles>
                   </xml> ";
-                return $imageTpl;
                 break;
 
-            case false:
-                $textTpl = "<xml>
+            case false: // false ： 文字
+                return "<xml>
                         <ToUserName><![CDATA[%s]]></ToUserName>
                         <FromUserName><![CDATA[%s]]></FromUserName>
                         <CreateTime>%s</CreateTime>
@@ -165,7 +160,6 @@ class WxSend extends WxBase
                         <Content><![CDATA[%s]]></Content>
                         <FuncFlag>0</FuncFlag>
                         </xml>";
-                return $textTpl;
                 break;
         }
     }

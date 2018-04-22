@@ -1,6 +1,11 @@
 <?php
 /**
- *  ** 求职区 **
+ * 抽象公用静态方法类
+ * @date    2018-01-23 17:13:04
+ * @version 1.0.2
+ * @authors wene (china_wangyu@aliyun.com)
+ *
+ *  *  *  ** 求职区 **
  *  期望城市： 成都
  *  期望薪资： 8k - 12k
  *
@@ -10,46 +15,11 @@
  *  开发语言: PHP / Python
  *
  *  联系方式：china_wangyu@aliyun.com
- * @date    2018-01-23 17:13:04
- * @version 1.0
- * @authors wene (china_wangyu@aliyun.com)
  */
 namespace wechat;
 
 abstract class WxBase
 {
-    private static $STATUSCODE = [ //常用的HTTP状态码
-        200 => 'OK',
-        204 => 'No Content',
-        400 => 'Bad Request',
-        401 => 'Unathorized',
-        403 => 'ForBidden',
-        404 => 'No Found',
-        405 => 'Method Not Allowed',
-        500 => 'Server Internal Error',
-    ];
-
-    /**
-     * [response 输出返回数据]
-     * @param  [type]       $code [HTTP状态码]
-     * @param  [type]       $msg  [返回 数据|错误 描述]
-     * @param  array        $data [返回数据]
-     * @return [Response]
-     */
-    public static function json($code, $msg, $data = [])
-    {
-        $param = [
-            'code' => $code,
-            'msg'  => $msg,
-            'data' => $data,
-        ];
-        header("HTTP/1.1 " . $code . " " . self::$STATUSCODE[$code]);
-        header('Content-Type:application/json;charset=utf-8');
-        if ($param !== null) {
-            echo json_encode($param, JSON_UNESCAPED_UNICODE);
-        }
-        exit();
-    }
 
     /**
      * [curl_request 发送http请求]
