@@ -290,6 +290,25 @@ wechat         模块目录
 
 ~~~
 
+##  文件参数储存 'File::param'
+
+~~~
+
+     
+      * 文件参数储存，可扩展
+      * @param string $var  key
+      * @param array $val value
+    
+    // 存值
+    \wechat\lib\File::param('key','value');
+    
+    // 取值
+    \wechat\lib\File::param('key');
+
+
+
+~~~
+
 
 >| 注：如有疑问，请联系邮箱 china_wangyu@aliyun.com
 

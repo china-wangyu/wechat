@@ -30,14 +30,14 @@ class WxTicket extends WxBase
     {
         /****************      验证微信普通token   ******************/
         empty($accessToken) && $accessToken = WxToken::getToken();
-        if (!isset($_SESSION['jsapi_ticket']) or empty($_SESSION['jsapi_ticket']) or time() - $_SESSION['jsapi_ticket_time'] > 7100) {
+        $param = \wechat\lib\File::param('ticket');
+        if ($param === null) {
             $wechat_jsapi_ticket_url       = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $accessToken;
             $result                        = self::curl_request($wechat_jsapi_ticket_url, true);
-            $_SESSION['jsapi_ticket']      = $result['ticket'];
-            $_SESSION['jsapi_ticket_time'] = $result['ticket'];
-            return $_SESSION['jsapi_ticket'];
+            \wechat\lib\File::param('ticket',$result);
+            return $result['ticket'];
         } else {
-            return $_SESSION['jsapi_ticket'];
+            return $param['ticket'];
         }
 
     }
@@ -50,7 +50,7 @@ class WxTicket extends WxBase
     public static function getSign($ticket = '')
     {
         empty($ticket) && $ticket = self::getTicket();
-        $data['url']              = $_SERVER['REQUEST_SCHEME'] . '//' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $data['url']              = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         $data['timestamp']        = time();
         $data['nonceStr']         = md5('timestamp=' . $data['timestamp']);
         $data['jsapi_ticket']     = $ticket;

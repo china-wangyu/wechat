@@ -18,7 +18,7 @@
  *  联系方式：china_wangyu@aliyun.com
  */
 
-namespace Reflection;
+namespace wechat\lib;
 
 class Annotation
 {
