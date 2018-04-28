@@ -27,7 +27,7 @@ class WxSend extends WxBase
      * @param  boolean         $template       [关键字模板 图文：true | 文本： false]
      * @return [string|boolen] [description]
      */
-    public static function sendKeyWord(array $paramObj = [], $postObj = [], $template = false)
+    public static function sendKeyWord(array $paramObj = [], $postObj = [], $template = 2)
     {
         (empty($paramObj) or empty($postObj)) && \wechat\lib\Abnormal::error('请设置正确的参数 $paramObj or $postObj~ !');
         $templateString = self::getKeyWordTemplate($template);
@@ -35,16 +35,18 @@ class WxSend extends WxBase
         $toUsername     = $postObj->ToUserName;
         $time           = time();
         switch ($template) {
-            case true:
+            case 1:
                 if (empty($paramObj['title']) or empty($paramObj['content']) or empty($paramObj['imgurl']) or empty($paramObj['jumpurl'])) {
                     \wechat\lib\Abnormal::error('请设置正确的参数值~!');
                 }
                 $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, $paramObj['title'], $paramObj['content'], $paramObj['imgurl'], $paramObj['jumpurl']);
                 break;
-            case false:
+            case 2:
                 empty($paramObj['content']) && \wechat\lib\Abnormal::error('请设置正确的参数值~!');
-
                 $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, 'text', $paramObj['content']);
+                break;
+            case 3:
+                $resultStr = sprintf($templateString, $fromUsername, $time);
                 break;
         }
 
@@ -130,10 +132,10 @@ class WxSend extends WxBase
      * @param  boolean  $type            [图文：true | 文本： false]
      * @return [string] [模板内容]
      */
-    private static function getKeyWordTemplate($type = true)
+    private static function getKeyWordTemplate($type = 1)
     {
         switch ($type) {
-            case true: // true : 图文
+            case 1: // true : 图文
                 return "<xml>
                   <ToUserName><![CDATA[%s]]></ToUserName>
                   <FromUserName><![CDATA[%s]]></FromUserName>
@@ -151,7 +153,7 @@ class WxSend extends WxBase
                   </xml> ";
                 break;
 
-            case false: // false ： 文字
+            case 2: // false ： 文字
                 return "<xml>
                         <ToUserName><![CDATA[%s]]></ToUserName>
                         <FromUserName><![CDATA[%s]]></FromUserName>
@@ -161,6 +163,15 @@ class WxSend extends WxBase
                         <FuncFlag>0</FuncFlag>
                         </xml>";
                 break;
+            case 3:
+                return '<xml>
+                          <ToUserName><![CDATA[%s]]></ToUserName>
+                          <FromUserName><![CDATA[%s]]></FromUserName>
+                          <CreateTime>%s</CreateTime>
+                          <MsgType><![CDATA[event]]></MsgType>
+                          <Event><![CDATA[subscribe]]></Event>
+                          <EventKey><![CDATA[scanbarcode]></EventKey>
+                        </xml>';
         }
     }
 }
