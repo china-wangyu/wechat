@@ -3,7 +3,7 @@
  * 微信模板类
  * @authors china_wangyu (china_wangyu@aliyun.com)
  * @date    2018-04-22 16:36:00
- * @version 1.0.2
+ * @version 1.0.3
  *
  *  ** 求职区 **
  *  期望城市： 成都
@@ -28,13 +28,13 @@ class WxTemplate extends WxBase
      */
     public static function initTemplate($template = [])
     {
-        $param             = self::trim_template($template['content']);
+        $param = self::trim_template($template['content']);
         $template['param'] = [
-            'touser'      => '', // 用户OPENID
+            'touser' => '', // 用户OPENID
             'template_id' => $template['template_id'], //模板ID
-            'url'         => '', // 跳转的url地址
-            'topcolor'    => '',
-            'data'        => $param, //模板必须参数
+            'url' => '', // 跳转的url地址
+            'topcolor' => '',
+            'data' => $param, //模板必须参数
         ];
         return $template;
     }
@@ -48,8 +48,8 @@ class WxTemplate extends WxBase
     {
         /****************      验证微信普通token   ******************/
         empty($accessToken) && $accessToken = WxToken::getToken();
-        $template_url                       = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=' . $accessToken;
-        $result                             = self::curl_request($template_url, true);
+        $template_url = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=' . $accessToken;
+        $result = self::curl_request($template_url, true);
         foreach ($result['template_list'] as $key) {
             $templateObj[] = self::initTemplate($key);
         }
@@ -64,8 +64,8 @@ class WxTemplate extends WxBase
     private static function trim_template($string)
     {
         $string = preg_replace('/([\x80-\xff]*)/i', '', $string);
-        $trim   = array(" ", "　", "\t", "\n", "\r", '.DATA', '}}');
-        $arr    = explode('{{', str_replace($trim, '', $string));
+        $trim = array(" ", "　", "\t", "\n", "\r", '.DATA', '}}');
+        $arr = explode('{{', str_replace($trim, '', $string));
         unset($arr[0]);
         return array_values($arr);
     }

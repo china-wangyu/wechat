@@ -3,7 +3,7 @@
  * 微信推送类
  * @authors china_wangyu (china_wangyu@aliyun.com)
  * @date    2018-04-22 16:36:00
- * @version 1.0.2
+ * @version 1.0.3
  *
  *  ** 求职区 **
  *  期望城市： 成都

@@ -3,7 +3,7 @@
  * 微信用户类
  * @authors china_wangyu (china_wangyu@aliyun.com)
  * @date    2018-04-22 16:36:00
- * @version 1.0.2
+ * @version 1.0.3
  *
  *  ** 求职区 **
  *  期望城市： 成都
@@ -31,7 +31,6 @@ class WxUser extends WxBase
         empty($appid) && \wechat\lib\Abnormal::error('请设置管理端微信公众号开发者APPID ~ !');
         //当前域名
         $service_url     = urlencode($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-        dump($service_url);die;
         $weixin_code_url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $appid . '&redirect_uri=' . $service_url . '&response_type=code&scope=snsapi_userinfo&state=state&connect_redirect=1#wechat_redirect';
         header('location: ' . $weixin_code_url);
     }

@@ -11,7 +11,7 @@
  *
  *  联系方式：china_wangyu@aliyun.com
  * @date    2018-01-31 17:13:04
- * @version 1.0.2
+ * @version 1.0.3
  * @authors wene (china_wangyu@aliyun.com)
  */
 namespace wechat;

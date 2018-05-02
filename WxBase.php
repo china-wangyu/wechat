@@ -2,7 +2,7 @@
 /**
  * 抽象公用静态方法类
  * @date    2018-01-23 17:13:04
- * @version 1.0.2
+ * @version 1.0.3
  * @authors wene (china_wangyu@aliyun.com)
  *
  *  *  *  ** 求职区 **
