@@ -30,11 +30,11 @@ class Qrcode extends WxBase
      */
     public static function file($fileDir = '', $url = '', $param = [])
     {
-        empty($fileDir) && \wechat\lib\Abnormal::error('文件路径不能为空~！');
+        empty($fileDir) && self::error('文件路径不能为空~！');
         is_dir($fileDir) ? '' : mkdir($fileDir, 0755);
         if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%
     =~_|]/i", $url)) {
-            \wechat\lib\Abnormal::error('URL格式不正确~！');
+            self::error('URL格式不正确~！');
         }
         $filepath = $fileDir . '/' . time() . '.jpg';
         switch ($param) {
@@ -42,7 +42,7 @@ class Qrcode extends WxBase
                 QRcode::png(urlencode($url), $filepath);
                 break;
             default:
-                QRcode::png(urlencode($url . '?' . self::ToUrlParams($param)), $filepath, '', 5);
+                QRcode::png(urlencode($url . '?' . self::url_splice_array($param)), $filepath, '', 5);
                 break;
         }
         return $filepath;
@@ -60,9 +60,9 @@ class Qrcode extends WxBase
     {
         if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%
     =~_|]/i", $url)) {
-            \wechat\lib\Abnormal::error('URL格式不正确~！');
+            self::error('URL格式不正确~！');
         }
-        is_array($param) && $url .= '?' . self::ToUrlParams($param);
+        is_array($param) && $url .= '?' . self::url_splice_array($param);
         return 'http://pan.baidu.com/share/qrcode?w=' . $width . '&h=' . $height . '&url=' . urlencode($url);
     }
 
@@ -78,9 +78,9 @@ class Qrcode extends WxBase
     {
         if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%
     =~_|]/i", $url)) {
-            \wechat\lib\Abnormal::error('URL格式不正确~！');
+            self::error('URL格式不正确~！');
         }
-        is_array($param) && $url .= '?' . self::ToUrlParams($param);
+        is_array($param) && $url .= '?' . self::url_splice_array($param);
         return '<img alt="二维码" src="http://pan.baidu.com/share/qrcode?w=' . $width . '&h=' . $height . '&url=' . urlencode($url) . ' />"';
     }
 

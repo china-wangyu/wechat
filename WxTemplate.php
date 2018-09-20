@@ -49,7 +49,7 @@ class WxTemplate extends WxBase
         /****************      验证微信普通token   ******************/
         empty($accessToken) && $accessToken = WxToken::getToken();
         $template_url = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=' . $accessToken;
-        $result = self::curl_request($template_url, true);
+        $result = self::get($template_url);
         foreach ($result['template_list'] as $key) {
             $templateObj[] = self::initTemplate($key);
         }

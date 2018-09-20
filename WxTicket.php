@@ -33,7 +33,7 @@ class WxTicket extends WxBase
         $param = \wechat\lib\File::param('ticket');
         if ($param === null) {
             $wechat_jsapi_ticket_url       = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $accessToken;
-            $result                        = self::curl_request($wechat_jsapi_ticket_url, true);
+            $result                        = self::get($wechat_jsapi_ticket_url);
             if(isset($result['ticket'])){
                 \wechat\lib\File::param('ticket',$result);
                 return $result['ticket'];

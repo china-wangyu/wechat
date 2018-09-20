@@ -29,7 +29,7 @@ class WxSend extends WxBase
      */
     public static function sendKeyWord(array $paramObj = [], $postObj = [], $template = 2)
     {
-        (empty($paramObj) or empty($postObj)) && \wechat\lib\Abnormal::error('请设置正确的参数 $paramObj or $postObj~ !');
+        (empty($paramObj) or empty($postObj)) && self::error('请设置正确的参数 $paramObj or $postObj~ !');
         $templateString = self::getKeyWordTemplate($template);
         $fromUsername   = $postObj->FromUserName;
         $toUsername     = $postObj->ToUserName;
@@ -37,12 +37,12 @@ class WxSend extends WxBase
         switch ($template) {
             case 1:
                 if (empty($paramObj['title']) or empty($paramObj['content']) or empty($paramObj['imgurl']) or empty($paramObj['jumpurl'])) {
-                    \wechat\lib\Abnormal::error('请设置正确的参数值~!');
+                    self::error('请设置正确的参数值~!');
                 }
                 $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, $paramObj['title'], $paramObj['content'], $paramObj['imgurl'], $paramObj['jumpurl']);
                 break;
             case 2:
-                empty($paramObj['content']) && \wechat\lib\Abnormal::error('请设置正确的参数值~!');
+                empty($paramObj['content']) && self::error('请设置正确的参数值~!');
                 $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, 'text', $paramObj['content']);
                 break;
             case 3:
@@ -66,7 +66,7 @@ class WxSend extends WxBase
     {
         /****************      验证微信普通token   ******************/
         empty($accessToken) && $accessToken = WxToken::getToken();
-        (empty($data) or empty($openid) or empty($templateid)) && \wechat\lib\Abnormal::error('请设置正确的参数 $template or $value~ !');
+        (empty($data) or empty($openid) or empty($templateid)) && self::error('请设置正确的参数 $template or $value~ !');
 
         $template['template_id'] = $templateid;
         $template['touser']      = $openid;
@@ -74,7 +74,7 @@ class WxSend extends WxBase
         $template['topcolor']    = empty($topcolor) ? '' : $topcolor;
         $template['data']        = $data;
         $send_url                = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
-        return self::curl_request($send_url, true, 'post', json_encode($template));
+        return self::post($send_url,  json_encode($template));
     }
 
     /**
@@ -96,11 +96,11 @@ class WxSend extends WxBase
     {
         /****************      验证微信普通token   ******************/
         empty($accessToken) && $accessToken = WxToken::getToken();
-        (!is_array($menu) or count($menu) == 0) && \wechat\lib\Abnormal::error('请设置正确的参数 $menu ~ !');
+        (!is_array($menu) or count($menu) == 0) && self::error('请设置正确的参数 $menu ~ !');
 
         $format_param['button'] = self::format_param($menu);
         $send_url               = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $accessToken;
-        return self::curl_request($send_url, true, 'post', json_encode($format_param, JSON_UNESCAPED_UNICODE));
+        return self::post($send_url, json_encode($format_param, JSON_UNESCAPED_UNICODE));
     }
 
     /**
