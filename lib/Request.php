@@ -78,7 +78,8 @@ class Request
             curl_setopt($ch, CURLOPT_POST, 1); //post提交方式
             curl_setopt($ch, CURLOPT_HEADER, 0); //设置header
             // 所需传的数组用 http_build_query() 函数处理一下，就可以传递二维数组了
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            if (is_array($data) and count($data) > 0) $data = http_build_query($data);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         } else {
             curl_setopt($ch, CURLOPT_TIMEOUT, 500);
         }
