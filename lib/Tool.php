@@ -5,7 +5,10 @@
 
 namespace wechat\lib;
 
-
+/**
+ * Trait Tool 工具类
+ * @package wechat\lib
+ */
 trait Tool
 {
     /**

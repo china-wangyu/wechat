@@ -1,23 +1,15 @@
 <?php
 /**
- *  ** 求职区 **
- *  期望城市： 成都
- *  期望薪资： 8k - 12k
- *
- *  个人信息
- *
- *  工作经验: 3年
- *  开发语言: PHP / Python
- *
- *  联系方式：china_wangyu@aliyun.com
- * @date    2018-01-31 17:13:04
- * @version 1.0.3
- * @authors wene (china_wangyu@aliyun.com)
+ * Created by wene. Date: 2018/9/20
  */
 namespace wechat;
 
 require_once '/lib/phpqrcode.php';
 
+/**
+ * Class Qrcode 二维码类
+ * @package wechat
+ */
 class Qrcode extends WxBase
 {
 

@@ -5,7 +5,10 @@
 
 namespace wechat\lib;
 
-
+/**
+ * Class Request 请求类
+ * @package wechat\lib
+ */
 class Request
 {
     /**

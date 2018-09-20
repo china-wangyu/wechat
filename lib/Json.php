@@ -6,6 +6,11 @@
 namespace wechat\lib;
 
 use Throwable;
+
+/**
+ * Class Json json输出类
+ * @package wechat\lib
+ */
 class Json extends \Exception
 {
     public function __construct(string $message = "", int $code = 0, Throwable $previous = null)
