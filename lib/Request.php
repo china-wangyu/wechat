@@ -77,8 +77,8 @@ class Request
         if ($method == 'post') {
             curl_setopt($ch, CURLOPT_POST, 1); //post提交方式
             curl_setopt($ch, CURLOPT_HEADER, 0); //设置header
-            // 所需传的数组用 http_bulid_query() 函数处理一下，就可以传递二维数组了
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_bulid_query($data));
+            // 所需传的数组用 http_build_query() 函数处理一下，就可以传递二维数组了
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
         } else {
             curl_setopt($ch, CURLOPT_TIMEOUT, 500);
         }
