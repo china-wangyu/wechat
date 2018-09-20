@@ -134,7 +134,7 @@ class WxSend extends WxBase
     public static function sendMenu($accessToken = '', $menu = [])
     {
         /****************      验证微信普通token   ******************/
-        //empty($accessToken) && $accessToken = WxToken::getToken();
+        empty($accessToken) && $accessToken = WxToken::getToken();
         (!is_array($menu) or count($menu) == 0) && self::error('请设置正确的参数 $menu ~ !');
 
         $format_param['button'] = self::format_param($menu);
