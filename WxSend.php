@@ -113,7 +113,7 @@ class WxSend extends WxBase
         $template['topcolor'] = empty($topcolor) ? '' : $topcolor;
         $template['data'] = $data;
         $send_url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
-        return self::post($send_url, $template);
+        return self::post($send_url, json_encode($template, JSON_UNESCAPED_UNICODE));
     }
 
     /**
@@ -139,7 +139,7 @@ class WxSend extends WxBase
 
         $format_param['button'] = self::format_param($menu);
         $send_url = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $accessToken;
-        return self::post($send_url, $format_param);
+        return self::post($send_url, json_encode($format_param, JSON_UNESCAPED_UNICODE));
     }
 
     /**
