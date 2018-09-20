@@ -71,14 +71,14 @@ class File
     private static function mkdir(string $type = 'param')
     {
         $file_dir = dirname(__FILE__) . static::$ext . 'log' ;
-        !is_dir($file_dir) &&  mkdir($file_dir, 0775);
+        (!is_dir($file_dir)) && mkdir($file_dir, 0775);
         $file_dir .=  static::$ext . date('Y-m-d-H') . static::$ext;
         if ($type == 'param') {
             $file_dir = dirname(__FILE__) . static::$ext . 'log' . static::$ext . 'param' . static::$ext;
         }
 
         $file_name = $type . '.log';
-        !is_dir($file_dir) && mkdir($file_dir, 0775);
+        (!is_dir($file_dir)) && mkdir($file_dir, 0775);
 
         if (!is_file($file_dir . $file_name)) {
             file_put_contents($file_dir . $file_name, '');

@@ -2,6 +2,7 @@
 /**
  * Created by wene. Date: 2018/9/20
  */
+
 namespace wechat;
 
 /**
@@ -12,18 +13,18 @@ class WxSend extends WxBase
 {
     /**
      * [sendKeyWord 关键字回复]
-     * @param  array           $paramObj       [参数数组]
-     * @param  array           $postObj        [微信对象]
-     * @param  boolean         $template       [关键字模板 图文：true | 文本： false]
+     * @param  array $paramObj [参数数组]
+     * @param  array $postObj [微信对象]
+     * @param  boolean $template [关键字模板 图文：true | 文本： false]
      * @return [string|boolen] [description]
      */
-    public static function sendKeyWord(array $paramObj = [], $postObj = [], $template = 2)
+    public static function sendKeyWord($paramObj = [], $postObj = [], $template = 2)
     {
         (empty($paramObj) or empty($postObj)) && self::error('请设置正确的参数 $paramObj or $postObj~ !');
         $templateString = self::getKeyWordTemplate($template);
-        $fromUsername   = $postObj->FromUserName;
-        $toUsername     = $postObj->ToUserName;
-        $time           = time();
+        $fromUsername = $postObj->FromUserName;
+        $toUsername = $postObj->ToUserName;
+        $time = time();
         switch ($template) {
             case 1:
                 if (empty($paramObj['title']) or empty($paramObj['content']) or empty($paramObj['imgurl']) or empty($paramObj['jumpurl'])) {
@@ -44,82 +45,8 @@ class WxSend extends WxBase
     }
 
     /**
-     * [sendMsg 发送模板消息]
-     * @param  string $templateid [模板ID]
-     * @param  string $openid     [用户openid]
-     * @param  array  $data       [模板参数]
-     * @param  string $url        [模板消息链接]
-     * @param  string $topcolor   [微信top颜色]
-     * @return [ajax] [boolen]
-     */
-    public static function sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000')
-    {
-        /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = WxToken::getToken();
-        (empty($data) or empty($openid) or empty($templateid)) && self::error('请设置正确的参数 $template or $value~ !');
-
-        $template['template_id'] = $templateid;
-        $template['touser']      = $openid;
-        $template['url']         = empty($url) ? '' : $url;
-        $template['topcolor']    = empty($topcolor) ? '' : $topcolor;
-        $template['data']        = $data;
-        $send_url                = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
-        return self::post($send_url,  json_encode($template));
-    }
-
-    /**
-     * [send_menu 生成菜单]
-     * 例如：$menu =[
-     *     'menu_name'=> '掌上商城',
-     *     'menu_status'=> 0; //0表示view
-     *     'menu_url' => 'http://www.baidu.com',
-     *     'chind' => [
-     *         'menu_name'=> '掌上商城',
-     *         'menu_status'=> 0; //0表示view
-     *         'menu_url' => 'http://www.baidu.com',
-     *         ],
-     *     ];
-     * @param  array   $menu                                  [菜单内容 ]
-     * @return [array] [微信返回值：状态值数组]
-     */
-    public static function sendMenu($accessToken = '', $menu = [])
-    {
-        /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = WxToken::getToken();
-        (!is_array($menu) or count($menu) == 0) && self::error('请设置正确的参数 $menu ~ !');
-
-        $format_param['button'] = self::format_param($menu);
-        $send_url               = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $accessToken;
-        return self::post($send_url, json_encode($format_param, JSON_UNESCAPED_UNICODE));
-    }
-
-    /**
-     * [format_param 格式化菜单数组]
-     * @param  [array] $menu      [数组]
-     * @return [array] [数组]
-     */
-    private static function format_param($menu)
-    {
-        $button = [];
-        foreach ($menu as $key => $val) {
-            $button[$key]['name'] = $val['menu_name'];
-            if (empty($val['chind'])) {
-                $button[$key]['type']                                   = $val['menu_status'] == 0 ? 'view' : 'click';
-                $button[$key][$val['menu_status'] == 0 ? 'url' : 'key'] = $val['menu_url'];
-            } else {
-                foreach ($val['chind'] as $chind => $value) {
-                    $button[$key]['sub_button'][$chind]['name']                                     = $value['menu_name'];
-                    $button[$key]['sub_button'][$chind]['type']                                     = $value['menu_status'] == 0 ? 'view' : 'click';
-                    $button[$key]['sub_button'][$chind][$chind['menu_status'] == 0 ? 'url' : 'key'] = $value['menu_url'];
-                }
-            }
-        }
-        return $button;
-    }
-
-    /**
      * [getKeyWordTemplate 获取模板关键字模板]
-     * @param  boolean  $type            [图文：true | 文本： false]
+     * @param  boolean $type [图文：true | 文本： false]
      * @return [string] [模板内容]
      */
     private static function getKeyWordTemplate($type = 1)
@@ -163,5 +90,79 @@ class WxSend extends WxBase
                           <EventKey><![CDATA[scanbarcode]></EventKey>
                         </xml>';
         }
+    }
+
+    /**
+     * [sendMsg 发送模板消息]
+     * @param  string $templateid [模板ID]
+     * @param  string $openid [用户openid]
+     * @param  array $data [模板参数]
+     * @param  string $url [模板消息链接]
+     * @param  string $topcolor [微信top颜色]
+     * @return [ajax] [boolen]
+     */
+    public static function sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000')
+    {
+        /****************      验证微信普通token   ******************/
+        empty($accessToken) && $accessToken = WxToken::getToken();
+        (empty($data) or empty($openid) or empty($templateid)) && self::error('请设置正确的参数 $template or $value~ !');
+
+        $template['template_id'] = $templateid;
+        $template['touser'] = $openid;
+        $template['url'] = empty($url) ? '' : $url;
+        $template['topcolor'] = empty($topcolor) ? '' : $topcolor;
+        $template['data'] = $data;
+        $send_url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
+        return self::post($send_url, $template);
+    }
+
+    /**
+     * [send_menu 生成菜单]
+     * 例如：$menu =[
+     *     'menu_name'=> '掌上商城',
+     *     'menu_status'=> 0; //0表示view
+     *     'menu_url' => 'http://www.baidu.com',
+     *     'chind' => [
+     *         'menu_name'=> '掌上商城',
+     *         'menu_status'=> 0; //0表示view
+     *         'menu_url' => 'http://www.baidu.com',
+     *         ],
+     *     ];
+     * @param  array $menu [菜单内容 ]
+     * @return [array] [微信返回值：状态值数组]
+     */
+    public static function sendMenu($accessToken = '', $menu = [])
+    {
+        /****************      验证微信普通token   ******************/
+        empty($accessToken) && $accessToken = WxToken::getToken();
+        (!is_array($menu) or count($menu) == 0) && self::error('请设置正确的参数 $menu ~ !');
+
+        $format_param['button'] = self::format_param($menu);
+        $send_url = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $accessToken;
+        return self::post($send_url, $format_param);
+    }
+
+    /**
+     * [format_param 格式化菜单数组]
+     * @param  [array] $menu      [数组]
+     * @return [array] [数组]
+     */
+    private static function format_param($menu)
+    {
+        $button = [];
+        foreach ($menu as $key => $val) {
+            $button[$key]['name'] = $val['menu_name'];
+            if (empty($val['chind'])) {
+                $button[$key]['type'] = $val['menu_status'] == 0 ? 'view' : 'click';
+                $button[$key][$val['menu_status'] == 0 ? 'url' : 'key'] = $val['menu_url'];
+            } else {
+                foreach ($val['chind'] as $chind => $value) {
+                    $button[$key]['sub_button'][$chind]['name'] = $value['menu_name'];
+                    $button[$key]['sub_button'][$chind]['type'] = $value['menu_status'] == 0 ? 'view' : 'click';
+                    $button[$key]['sub_button'][$chind][$chind['menu_status'] == 0 ? 'url' : 'key'] = $value['menu_url'];
+                }
+            }
+        }
+        return $button;
     }
 }
