@@ -50,7 +50,7 @@ class Request
     public static function request(string $method,string $url,array $params = []):array
     {
         $isHttp = strpos($url,'https') ?  true : false;
-        if (!in_array($method,static::$methods)) Json::error('请求类型错误~');
+        if (!in_array(strtolower($method),static::$methods)) Json::error('请求类型错误~');
         if ($method === 'get' and !empty($params)) $url .= static::ToUrlParams($params);
         return static::curl_request($url,$isHttp,$method,$params);
     }
