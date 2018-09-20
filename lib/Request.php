@@ -47,7 +47,7 @@ class Request
      * @param array $params  请求参数
      * @return array
      */
-    public static function request(string $method,string $url,array $params = []):array
+    public static function request(string $method,string $url, $params = []):array
     {
         $isHttp = strpos($url,'https') ?  true : false;
         if (!in_array(strtolower($method),static::$methods)) Json::error('请求类型错误~');
