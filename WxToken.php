@@ -21,7 +21,7 @@ class WxToken extends WxBase
     public static function getToken($appid = '', $appSecret = '')
     {
         $param = \wechat\lib\File::param('access_token');
-        if ($param === null) {
+        if ($param === null or (isset($param['time']) and time() - $param['time'] > 7150)) {
             /****************      进行微信AppID 和 AppSecret的验证   ******************/
             (empty($appid) or empty($appSecret)) && self::error('请设置管理端微信公众号开发者APPID 和 APPSECRET~ !');
             (!is_string($appid) or !is_string($appSecret)) && self::error('微信公众号开发者APPID 和 APPSECRET格式错误~ !');
