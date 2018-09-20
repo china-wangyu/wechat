@@ -15,7 +15,7 @@ class File
     /**
      * 定义常量 / 路径连接符
      */
-    const EXT = '/';
+    private static $ext = '/';
 
     /**
      * 存储对象文件，可扩展
@@ -70,9 +70,9 @@ class File
      */
     private static function mkdir(string $type = 'param')
     {
-        $file_dir = dirname(__FILE__) . EXT . 'log' . EXT . date('Y-m-d-H') . EXT;
+        $file_dir = dirname(__FILE__) . static::$ext . 'log' . static::$ext . date('Y-m-d-H') . static::$ext;
         if ($type == 'param') {
-            $file_dir = dirname(__FILE__) . EXT . 'log' . EXT . 'param' . EXT;
+            $file_dir = dirname(__FILE__) . static::$ext . 'log' . static::$ext . 'param' . static::$ext;
         }
 
         $file_name = $type . '.log';
