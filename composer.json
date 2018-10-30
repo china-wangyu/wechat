@@ -1,23 +1,42 @@
 {
-  "name":             "china-wangyu/wechat",
-  "description":      "wechat PHP 微信 微信授权 微信用户信息 微信token 微信模板 微信自定义菜单生产 微信JDK 微信关键字回复 微信模板消息发送",
-  "keywords":         ["wechat", "performance", "php"],
+  "name": "china-wangyu/wechat",
+  "description": "wechat PHP 微信 微信授权 微信用户信息 微信token 微信模板 微信自定义菜单生产 微信JDK 微信关键字回复 微信模板消息发送",
+  "keywords": [
+    "wechat",
+    "performance",
+    "php"
+  ],
   "homepage": "https://gitee.com/china_wangyu/wechat",
   "license": "MIT",
+  "type": "library",
   "authors": [
-  {
-	"name": "china-wangyu",
-	"email": "china-wangyu@aliyun.com",
-	"homepage": "https://gitee.com/china_wangyu/wechat",
-	"role": "Developer"
-  }],
-  "require":{
-      "PHP" : ">= 7.2.0",
-    "endroid/qr-code": "^3.4"
+    {
+      "name": "china-wangyu",
+      "email": "china-wangyu@aliyun.com",
+      "homepage": "https://gitee.com/china_wangyu/wechat",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=7.2"
   },
+  "require-dev": {
+    "endroid/qr-code": "3.4\u001b[D\u001b[D\u001b[D>\u001b[3~\u001b[3~\u001b[3~=3.4"
+  },
+  "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
-      "Guanguans\\": "src/"
+      "wechat\\WxBase\\": "src/wechat/WxBase",
+      "wechat\\WxQrcode\\": "src/wechat/WxQrcode",
+      "wechat\\WxSend\\": "src/wechat/WxSend",
+      "wechat\\WxTemplate\\": "src/wechat/WxTemplate",
+      "wechat\\Ticket\\": "src/wechat/Ticket",
+      "wechat\\WxToken\\": "src/wechat/WxToken",
+      "wechat\\WxUser\\": "src/wechat/WxUser",
+      "wechat\\lib\\File\\": "src/wechat/lib/File",
+      "wechat\\lib\\Json\\": "src/wechat/lib/Json",
+      "wechat\\lib\\Request\\": "src/wechat/lib/Request",
+      "wechat\\lib\\Tool\\": "src/wechat/lib/Tool"
     }
   },
   "repositories": {

@@ -11,7 +11,7 @@ use Endroid\QrCode\Response\QrCodeResponse;
  * Class Qrcode 二维码类
  * @package wechat
  */
-class Qrcode extends EndroidQrCode
+class WxQrcode extends EndroidQrCode
 {
     protected $margin = 10;
     protected $ext = 'png';
@@ -82,10 +82,10 @@ class Qrcode extends EndroidQrCode
         $filepath = $fileDir . '/' . time() . '.jpg';
         switch ($param) {
             case count($param) == 0 or !is_array($param):
-                QRcode::png(urlencode($url), $filepath);
+                WxQrcode::png(urlencode($url), $filepath);
                 break;
             default:
-                QRcode::png(urlencode($url . '?' . self::url_splice_array($param)), $filepath, '', 5);
+                WxQrcode::png(urlencode($url . '?' . self::url_splice_array($param)), $filepath, '', 5);
                 break;
         }
         return $filepath;
