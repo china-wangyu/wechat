@@ -4,14 +4,65 @@
  */
 namespace wechat;
 
-require_once '/lib/phpqrcode.php';
+use Endroid\QrCode\{QrCode as EndroidQrCode,LabelAlignment,ErrorCorrectionLevel};
+use Endroid\QrCode\Response\QrCodeResponse;
 
 /**
  * Class Qrcode 二维码类
  * @package wechat
  */
-class Qrcode extends WxBase
+class Qrcode extends EndroidQrCode
 {
+    protected $margin = 10;
+    protected $ext = 'png';
+    protected $width = 300;
+    protected $height = 300;
+    protected $content = 'png';
+
+    protected $encoding = 'UTF-8';
+    protected $foregroundColor = ['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0];
+    protected $backgroundColor = ['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0];
+    protected $saveFile = __DIR__.'/qrcode.png';
+
+    protected $logoPath = __DIR__.'/qrcode.png';
+    protected $logoWidth = 150;
+    protected $logoHeight = 200;
+
+    public function __construct(string $text = '')
+    {
+        parent::__construct($text);
+    }
+
+    public static final function style(string $text = '')
+    {
+        // Create a basic QR code
+        $qrCode = new static($text);
+        $qrCode->setSize($qrCode->width);
+
+        // Set advanced options
+        $qrCode->setWriterByName($qrCode->ext);
+        $qrCode->setMargin($qrCode->margin);
+        $qrCode->setEncoding($qrCode->encoding);
+        $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH);
+        $qrCode->setForegroundColor($qrCode->foregroundColor);
+        $qrCode->setBackgroundColor($qrCode->backgroundColor);
+        $qrCode->setLabel('Scan the code', 16, __DIR__.'/../assets/fonts/noto_sans.otf', LabelAlignment::CENTER);
+        $qrCode->setLogoPath($qrCode->logoPath);
+        $qrCode->setLogoSize($qrCode->logoWidth, $qrCode->logoHeight);
+        $qrCode->setRoundBlockSize(true);
+        $qrCode->setValidateResult(false);
+        $qrCode->setWriterOptions(['exclude_xml_declaration' => true]);
+
+        // Directly output the QR code
+        header('Content-Type: '.$qrCode->getContentType());
+        echo $qrCode->writeString();
+
+        // Save it to a file
+        $qrCode->writeFile(__DIR__.'/qrcode.png');
+
+        // Create a response object
+        $response = new QrCodeResponse($qrCode);
+    }
 
     /**
      * [file 生成二维码文件]

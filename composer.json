@@ -12,11 +12,14 @@
 	"role": "Developer"
   }],
   "require":{
-      "PHP" : ">= 5.6.0"
+      "PHP" : ">= 7.2.0",
+    "endroid/qr-code": "^3.4"
   },
   "autoload": {
-      "psr-4": { "": "" }
-    },
+    "psr-4": {
+      "Guanguans\\": "src/"
+    }
+  },
   "repositories": {
     "packagist": {
       "type": "composer",
