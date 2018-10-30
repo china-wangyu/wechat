@@ -17,11 +17,9 @@
       "role": "Developer"
     }
   ],
-  "require": {
-    "php": ">=7.2"
-  },
-  "require-dev": {
-    "endroid/qr-code": "3.4\u001b[D\u001b[D\u001b[D>\u001b[3~\u001b[3~\u001b[3~=3.4"
+  "require":{
+    "PHP" : ">= 7.2.0",
+    "endroid/qr-code": "^3.4"
   },
   "minimum-stability": "dev",
   "autoload": {
