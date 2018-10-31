@@ -2,13 +2,13 @@
 /**
  * Created by wene. Date: 2018/9/20
  */
-namespace wechat;
+namespace WeChat\Core;
 
 /**
  * Class WxTemplate 微信模板类
  * @package wechat
  */
-class WxTemplate extends WxBase
+class Template extends Base
 {
 
     /**
@@ -37,7 +37,7 @@ class WxTemplate extends WxBase
     public static function getAllTemplate($accessToken = '')
     {
         /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = WxToken::getToken();
+        empty($accessToken) && $accessToken = Token::getToken();
         $template_url = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=' . $accessToken;
         $result = self::get($template_url);
         foreach ($result['template_list'] as $key) {

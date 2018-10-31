@@ -18,22 +18,14 @@
     }
   ],
   "require":{
-    "PHP" : ">= 7.2.0"
+    "PHP" : ">= 7.2.0",
+    "endroid/qr-code" : ">=3.4"
   },
   "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
-      "wechat\\WxBase\\": "src/wechat/WxBase",
-      "wechat\\WxQrcode\\": "src/wechat/WxQrcode",
-      "wechat\\WxSend\\": "src/wechat/WxSend",
-      "wechat\\WxTemplate\\": "src/wechat/WxTemplate",
-      "wechat\\Ticket\\": "src/wechat/Ticket",
-      "wechat\\WxToken\\": "src/wechat/WxToken",
-      "wechat\\WxUser\\": "src/wechat/WxUser",
-      "wechat\\lib\\File\\": "src/wechat/lib/File",
-      "wechat\\lib\\Json\\": "src/wechat/lib/Json",
-      "wechat\\lib\\Request\\": "src/wechat/lib/Request",
-      "wechat\\lib\\Tool\\": "src/wechat/lib/Tool"
+      "WeChat\\Core\\": "src/WeChat/Core",
+      "WeChat\\Lib\\": "src/WeChat/Lib"
     }
   },
   "repositories": {

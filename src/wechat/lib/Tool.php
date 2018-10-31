@@ -3,7 +3,7 @@
  * Created by wene. Date: 2018/9/20
  */
 
-namespace wechat\lib;
+namespace WeChat\Lib;
 
 /**
  * Trait Tool 工具类

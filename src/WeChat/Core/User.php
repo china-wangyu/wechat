@@ -3,13 +3,13 @@
  * Created by wene. Date: 2018/9/20
  */
 
-namespace wechat;
+namespace WeChat\Core;
 
 /**
  * Class WxUser 微信用户类
  * @package wechat
  */
-class WxUser extends WxBase
+class User extends Base
 {
 
     /**

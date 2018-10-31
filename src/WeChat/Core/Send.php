@@ -3,13 +3,13 @@
  * Created by wene. Date: 2018/9/20
  */
 
-namespace wechat;
+namespace WeChat\Core;
 
 /**
  * Class WxSend 微信推送类
  * @package wechat
  */
-class WxSend extends WxBase
+class Send extends Base
 {
     /**
      * [sendKeyWord 关键字回复]
@@ -104,7 +104,7 @@ class WxSend extends WxBase
     public static function sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000')
     {
         /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = WxToken::getToken();
+        empty($accessToken) && $accessToken = Token::getToken();
         (empty($data) or empty($openid) or empty($templateid)) && self::error('请设置正确的参数 $template or $value~ !');
 
         $template['template_id'] = $templateid;
@@ -134,7 +134,7 @@ class WxSend extends WxBase
     public static function sendMenu($accessToken = '', $menu = [])
     {
         /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = WxToken::getToken();
+        empty($accessToken) && $accessToken = Token::getToken();
         (!is_array($menu) or count($menu) == 0) && self::error('请设置正确的参数 $menu ~ !');
 
         $format_param['button'] = self::format_param($menu);

@@ -2,13 +2,13 @@
 /**
  * Created by wene. Date: 2018/9/20
  */
-namespace wechat;
+namespace WeChat\Core;
 
 /**
  * Class WxTicket 微信ticket类 含签名生成
  * @package wechat
  */
-class WxTicket extends WxBase
+class Ticket extends Base
 {
 
     /**
@@ -19,13 +19,13 @@ class WxTicket extends WxBase
     public static function getTicket($accessToken = '')
     {
         /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = WxToken::getToken();
-        $param = \wechat\lib\File::param('ticket');
+        empty($accessToken) && $accessToken = Token::getToken();
+        $param = \WeChat\Lib\File::param('ticket');
         if ($param === null or (isset($param['time']) and time() - $param['time'] > 7150)) {
             $wechat_jsapi_ticket_url       = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $accessToken;
             $result                        = self::get($wechat_jsapi_ticket_url);
             if(isset($result['ticket'])){
-                \wechat\lib\File::param('ticket',$result);
+                \WeChat\Lib\File::param('ticket',$result);
                 return $result['ticket'];
             }else{
                 return false;

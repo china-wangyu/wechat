@@ -2,16 +2,16 @@
 /**
  * Created by wene. Date: 2018/9/20
  */
-namespace wechat;
+namespace WeChat\Core;
 
-use Endroid\QrCode\{QrCode as EndroidQrCode,LabelAlignment,ErrorCorrectionLevel};
-use Endroid\QrCode\Response\QrCodeResponse;
+//use Endroid\QrCode\{QrCode as EndroidQrCode,LabelAlignment,ErrorCorrectionLevel};
+//use Endroid\QrCode\Response\QrCodeResponse;
 
 /**
  * Class Qrcode 二维码类
  * @package wechat
  */
-class WxQrcode extends EndroidQrCode
+class QrCode extends EndroidQrCode
 {
     protected $margin = 10;
     protected $ext = 'png';
@@ -28,40 +28,40 @@ class WxQrcode extends EndroidQrCode
     protected $logoWidth = 150;
     protected $logoHeight = 200;
 
-    public function __construct(string $text = '')
-    {
-        parent::__construct($text);
-    }
+//    public function __construct(string $text = '')
+//    {
+//        parent::__construct($text);
+//    }
 
     public static final function style(string $text = '')
     {
         // Create a basic QR code
-        $qrCode = new static($text);
-        $qrCode->setSize($qrCode->width);
-
-        // Set advanced options
-        $qrCode->setWriterByName($qrCode->ext);
-        $qrCode->setMargin($qrCode->margin);
-        $qrCode->setEncoding($qrCode->encoding);
-        $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH);
-        $qrCode->setForegroundColor($qrCode->foregroundColor);
-        $qrCode->setBackgroundColor($qrCode->backgroundColor);
-        $qrCode->setLabel('Scan the code', 16, __DIR__.'/../assets/fonts/noto_sans.otf', LabelAlignment::CENTER);
-        $qrCode->setLogoPath($qrCode->logoPath);
-        $qrCode->setLogoSize($qrCode->logoWidth, $qrCode->logoHeight);
-        $qrCode->setRoundBlockSize(true);
-        $qrCode->setValidateResult(false);
-        $qrCode->setWriterOptions(['exclude_xml_declaration' => true]);
-
-        // Directly output the QR code
-        header('Content-Type: '.$qrCode->getContentType());
-        echo $qrCode->writeString();
-
-        // Save it to a file
-        $qrCode->writeFile(__DIR__.'/qrcode.png');
-
-        // Create a response object
-        $response = new QrCodeResponse($qrCode);
+//        $qrCode = new static($text);
+//        $qrCode->setSize($qrCode->width);
+//
+//        // Set advanced options
+//        $qrCode->setWriterByName($qrCode->ext);
+//        $qrCode->setMargin($qrCode->margin);
+//        $qrCode->setEncoding($qrCode->encoding);
+//        $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH);
+//        $qrCode->setForegroundColor($qrCode->foregroundColor);
+//        $qrCode->setBackgroundColor($qrCode->backgroundColor);
+//        $qrCode->setLabel('Scan the code', 16, __DIR__.'/../assets/fonts/noto_sans.otf', LabelAlignment::CENTER);
+//        $qrCode->setLogoPath($qrCode->logoPath);
+//        $qrCode->setLogoSize($qrCode->logoWidth, $qrCode->logoHeight);
+//        $qrCode->setRoundBlockSize(true);
+//        $qrCode->setValidateResult(false);
+//        $qrCode->setWriterOptions(['exclude_xml_declaration' => true]);
+//
+//        // Directly output the QR code
+//        header('Content-Type: '.$qrCode->getContentType());
+//        echo $qrCode->writeString();
+//
+//        // Save it to a file
+//        $qrCode->writeFile(__DIR__.'/qrcode.png');
+//
+//        // Create a response object
+//        $response = new QrCodeResponse($qrCode);
     }
 
     /**

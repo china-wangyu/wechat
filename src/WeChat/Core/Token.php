@@ -3,13 +3,13 @@
  * Created by wene. Date: 2018/9/20
  */
 
-namespace wechat;
+namespace WeChat\Core;
 
 /**
  * Class WxToken 微信Token类
  * @package wechat
  */
-class WxToken extends WxBase
+class Token extends Base
 {
 
     /**
@@ -20,7 +20,7 @@ class WxToken extends WxBase
      */
     public static function getToken($appid = '', $appSecret = '')
     {
-        $param = \wechat\lib\File::param('access_token');
+        $param = \WeChat\Lib\File::param('access_token');
         if ($param === null or (isset($param['time']) and time() - $param['time'] > 7150)) {
             /****************      进行微信AppID 和 AppSecret的验证   ******************/
             (empty($appid) or empty($appSecret)) && self::error('请设置管理端微信公众号开发者APPID 和 APPSECRET~ !');
@@ -29,7 +29,7 @@ class WxToken extends WxBase
             if (strlen(trim($appid)) == 18 or strlen(trim($appSecret)) == 18) {
                 $access_token_url              = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . $appid . '&secret=' . $appSecret;
                 $result                        = self::get($access_token_url);
-                \wechat\lib\File::param('access_token',$result);
+                \WeChat\Lib\File::param('access_token',$result);
                 return $result['access_token'];
             } else {
                 self::error('请设置正确格式的微信公众号开发者APPID 和 APPSECRET~ !');
