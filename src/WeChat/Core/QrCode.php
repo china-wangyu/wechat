@@ -2,100 +2,88 @@
 /**
  * Created by wene. Date: 2018/9/20
  */
+
 namespace WeChat\Core;
 
-//use Endroid\QrCode\{QrCode as EndroidQrCode,LabelAlignment,ErrorCorrectionLevel};
-//use Endroid\QrCode\Response\QrCodeResponse;
+use Endroid\QrCode\{QrCode as EndroidQrCode, ErrorCorrectionLevel};
 
 /**
  * Class Qrcode 二维码类
  * @package wechat
  */
-class QrCode extends EndroidQrCode
+class QrCode extends Base
 {
-    protected $margin = 10;
-    protected $ext = 'png';
-    protected $width = 300;
-    protected $height = 300;
-    protected $content = 'png';
-
-    protected $encoding = 'UTF-8';
-    protected $foregroundColor = ['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0];
-    protected $backgroundColor = ['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0];
-    protected $saveFile = __DIR__.'/qrcode.png';
-
-    protected $logoPath = __DIR__.'/qrcode.png';
-    protected $logoWidth = 150;
-    protected $logoHeight = 200;
-
-//    public function __construct(string $text = '')
-//    {
-//        parent::__construct($text);
-//    }
-
-    public static final function style(string $text = '')
-    {
-        // Create a basic QR code
-//        $qrCode = new static($text);
-//        $qrCode->setSize($qrCode->width);
-//
-//        // Set advanced options
-//        $qrCode->setWriterByName($qrCode->ext);
-//        $qrCode->setMargin($qrCode->margin);
-//        $qrCode->setEncoding($qrCode->encoding);
-//        $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH);
-//        $qrCode->setForegroundColor($qrCode->foregroundColor);
-//        $qrCode->setBackgroundColor($qrCode->backgroundColor);
-//        $qrCode->setLabel('Scan the code', 16, __DIR__.'/../assets/fonts/noto_sans.otf', LabelAlignment::CENTER);
-//        $qrCode->setLogoPath($qrCode->logoPath);
-//        $qrCode->setLogoSize($qrCode->logoWidth, $qrCode->logoHeight);
-//        $qrCode->setRoundBlockSize(true);
-//        $qrCode->setValidateResult(false);
-//        $qrCode->setWriterOptions(['exclude_xml_declaration' => true]);
-//
-//        // Directly output the QR code
-//        header('Content-Type: '.$qrCode->getContentType());
-//        echo $qrCode->writeString();
-//
-//        // Save it to a file
-//        $qrCode->writeFile(__DIR__.'/qrcode.png');
-//
-//        // Create a response object
-//        $response = new QrCodeResponse($qrCode);
-    }
 
     /**
-     * [file 生成二维码文件]
-     * @param  string $fileDir [文件目录]
-     * @param  string $url      [二维码网址]
-     * @param  array  $param    [二维码参数]
-     * @return [string]           [二维码地址]
+     * 生成二维码
+     * @param string|null $text  二维码内容 默认：
+     * @param string|null $filePath 二维码储存路径 默认：null
+     * @param string|null $label    二维码标签 默认：null
+     * @param string|null $logoPath 二维码设置logo 默认：null
+     * @param int $size     二维码宽度，默认：300
+     * @param int $margin   二维码点之间的间距 默认：10
+     * @param string $byName    生成图片的后缀名 默认：png格式
+     * @param string $encoding  编码语言，默认'UTF-8',基本不用更改
+     * @param array $foregroundColor    前景色
+     * @param array $backgroundColor    背景色
+     * @param int $logoWidth    二维码logo宽度
+     * @param int $logoHeight   二维码logo高度
+     * @return bool|string  返回值
+     * @throws \Endroid\QrCode\Exception\InvalidPathException
      */
-    public static function file($fileDir = '', $url = '', $param = [])
+    public static function create(string $text = '', string $filePath = null, string $label = null, string $logoPath = null,
+                                  int $size = 300, int $margin = 15, string $byName = 'png',
+                                  string $encoding = 'UTF-8',array $foregroundColor = ['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0],
+                                  array $backgroundColor = ['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0],
+                                  int $logoWidth = 100,int $logoHeight = 100)
     {
-        empty($fileDir) && self::error('文件路径不能为空~！');
-        is_dir($fileDir) ? '' : mkdir($fileDir, 0755);
-        if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%
-    =~_|]/i", $url)) {
-            self::error('URL格式不正确~！');
+        try{
+            // Create a basic QR code
+            $qrCode = new EndroidQrCode($text);
+
+            // Set advanced options
+            $qrCode->setSize($size);
+            $qrCode->setWriterByName($byName); // File suffix name
+            $qrCode->setMargin($margin);
+            $qrCode->setEncoding($encoding);
+            $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH);
+            $qrCode->setForegroundColor($foregroundColor);
+            $qrCode->setBackgroundColor($backgroundColor);
+            if (!is_null($label)){
+                $qrCode->setLabel($label);
+            }
+            if (!is_null($logoPath)){
+                $qrCode->setLogoPath($logoPath);
+                $qrCode->setLogoSize($logoWidth, $logoHeight);
+            }
+            $qrCode->setRoundBlockSize(true);
+            $qrCode->setValidateResult(true);
+            $qrCode->setWriterOptions(['exclude_xml_declaration' => true]);
+
+            if (!is_null($filePath)){
+                // Save it to a file
+                if (!is_dir(dirname($filePath))){
+                    mkdir(dirname($filePath),755);
+                }
+                $qrCode->writeFile($filePath);
+                return $filePath ? True : False;
+            }else{
+                // Directly output the QR code
+                header('Content-Type: ' . $qrCode->getContentType());
+                return $qrCode->writeString();
+            }
+        }catch (\WeChat\Extend\Json $exception){
+            return $exception->getMessage();
         }
-        $filepath = $fileDir . '/' . time() . '.jpg';
-        switch ($param) {
-            case count($param) == 0 or !is_array($param):
-                WxQrcode::png(urlencode($url), $filepath);
-                break;
-            default:
-                WxQrcode::png(urlencode($url . '?' . self::url_splice_array($param)), $filepath, '', 5);
-                break;
-        }
-        return $filepath;
+
     }
+
 
     /**
      * [url 生成二维码链接]
      * @param  [type] $url    [二维码网址]
-     * @param  array  $param  [二维码参数]
-     * @param  string $width  [二维码宽度]
+     * @param  array $param [二维码参数]
+     * @param  string $width [二维码宽度]
      * @param  string $height [二维码高度]
      * @return [string]         [参数加密后的二维码链接]
      */
@@ -112,8 +100,8 @@ class QrCode extends EndroidQrCode
     /**
      * [html 生成二维码html <img src=''> 标签]
      * @param  [type] $url    [二维码网址]
-     * @param  array  $param  [二维码参数]
-     * @param  string $width  [二维码宽度]
+     * @param  array $param [二维码参数]
+     * @param  string $width [二维码宽度]
      * @param  string $height [二维码高度]
      * @return [string]         [二维码<img src=''> 标签]
      */

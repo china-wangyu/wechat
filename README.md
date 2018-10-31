@@ -263,16 +263,36 @@ WeChat         模块目录
 
 ~~~
 
-     * [file 生成二维码文件]
-     * @param  string $fileDir [文件目录]
-     * @param  string $url      [二维码网址]
-     * @param  array  $param    [二维码参数]
-     * @return [string]           [二维码地址]
-
-    \WeChat\Qrcode::file($fileDir = '', $url = '', $param = []);
-
-
-
+     /**
+          * 生成二维码
+          * @param string|null $text  二维码内容 默认：
+          * @param string|null $label    二维码标签 默认：null
+          * @param string|null $filePath 二维码储存路径 默认：null
+          * @param string|null $logoPath 二维码设置logo 默认：null
+          * @param int $size     二维码宽度，默认：300
+          * @param int $margin   二维码点之间的间距 默认：10
+          * @param string $byName    生成图片的后缀名 默认：png格式
+          * @param string $encoding  编码语言，默认'UTF-8',基本不用更改
+          * @param array $foregroundColor    前景色
+          * @param array $backgroundColor    背景色
+          * @param int $logoWidth    二维码logo宽度
+          * @param int $logoHeight   二维码logo高度
+          * @return bool|string  返回值
+          * @throws \Endroid\QrCode\Exception\InvalidPathException
+          */
+         public static function create(string $text = '', string $label = null, string $filePath = null,
+                                       string $logoPath = null, int $size = 300, int $margin = 15, string $byName = 'png',
+                                       string $encoding = 'UTF-8',array $foregroundColor = ['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0],
+                                       array $backgroundColor = ['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0],
+                                       int $logoWidth = 100,int $logoHeight = 100)
+                                       
+         使用方式：
+         
+            1. 生成二维码，但不生成二维码文件
+            $qrocde = \WeChat\Core\QrCode::create('二维码内容');
+            
+            2. 生成二维码文件
+            $qrocde = \WeChat\Core\QrCode::create('二维码内容','文件存放路径');
 ~~~
 
 ### 生成二维码链接 `url`
