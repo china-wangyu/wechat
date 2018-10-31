@@ -3,7 +3,7 @@
  * Created by wene. Date: 2018/9/20
  */
 
-namespace WeChat\Lib;
+namespace WeChat\Extend;
 
 /**
  * Class File 微信存储类

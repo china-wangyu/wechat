@@ -10,5 +10,5 @@ namespace WeChat\Core;
  */
 abstract class Base
 {
-    use \WeChat\Lib\Tool;
+    use \WeChat\Extend\Tool;
 }

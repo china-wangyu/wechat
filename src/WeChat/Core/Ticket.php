@@ -20,12 +20,12 @@ class Ticket extends Base
     {
         /****************      验证微信普通token   ******************/
         empty($accessToken) && $accessToken = Token::getToken();
-        $param = \WeChat\Lib\File::param('ticket');
+        $param = \WeChat\Extend\File::param('ticket');
         if ($param === null or (isset($param['time']) and time() - $param['time'] > 7150)) {
             $wechat_jsapi_ticket_url       = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $accessToken;
             $result                        = self::get($wechat_jsapi_ticket_url);
             if(isset($result['ticket'])){
-                \WeChat\Lib\File::param('ticket',$result);
+                \WeChat\Extend\File::param('ticket',$result);
                 return $result['ticket'];
             }else{
                 return false;
