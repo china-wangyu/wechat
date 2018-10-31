@@ -71,7 +71,7 @@ WeChat         模块目录
         
         ├─QrCode.php             微信生成二维码
         
-├─ Lib         依赖目录
+├─ Extend         依赖目录
 
          ├─File.php                 文件存储类。
                 
@@ -211,7 +211,7 @@ WeChat         模块目录
 
     例如：
 
-    $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+    $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', ExtendXML_NOCDATA);
     $paramObj['content'] = '来啊~';
     \WeChat\Send::sendKeyWord($paramObj, $postObj);
 
@@ -319,10 +319,10 @@ WeChat         模块目录
       * @param array $val value
     
     // 存值
-    \WeChat\lib\File::param('key','value');
+    \WeChat\Extend\File::param('key','value');
     
     // 取值
-    \WeChat\lib\File::param('key');
+    \WeChat\Extend\File::param('key');
 
 
 
