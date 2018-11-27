@@ -11,6 +11,14 @@ namespace WeChat\Core;
  */
 class User extends Base
 {
+    // 第一步：用户同意授权，获取code
+    private static $getCodeUrl = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=snsapi_userinfo&state=state&connect_redirect=1#wechat_redirect';
+
+    // 第二步：通过code换取网页授权access_token
+    private static $getOpenIdUrl = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code';
+
+    // 第三步：拉取用户信息(需scope为 snsapi_userinfo)
+    private static $getUserInfoUrl = 'https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN';
 
     /**
      * [code 重载http,获取微信授权]
@@ -22,8 +30,10 @@ class User extends Base
         empty($appid) && self::error('请设置管理端微信公众号开发者APPID ~ !');
         //当前域名
         $service_url = urlencode($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-        $weixin_code_url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $appid . '&redirect_uri=' . $service_url . '&response_type=code&scope=snsapi_userinfo&state=state&connect_redirect=1#wechat_redirect';
-        self::header($weixin_code_url);
+
+        static::$getCodeUrl = str_replace('APPID',$appid,static::$getCodeUrl);
+        static::$getCodeUrl = str_replace('REDIRECT_URI',$service_url,static::$getCodeUrl);
+        self::header(static::$getCodeUrl);
     }
 
     /**
@@ -34,16 +44,20 @@ class User extends Base
      * @param bool $type    true:获取用户信息 | false:用户openid
      * @return array    用户信息|用户openid
      */
-    public static function getOpenid($code, $appid, $appSecret, $type = false)
+    public static function openid($code, $appid, $appSecret, $type = false)
     {
         //验证参数
         (empty($appid) or empty($appSecret)) && self::error('请设置管理端微信公众号开发者APPID 和 APPSECRET~ !');
         empty($code) && self::error('请验证是否传了正确的参数 code ~ !');
-        //获取用户数据
-        $weixin_oauth2_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' . $appid . '&secret=' . $appSecret . '&code=' . $code . '&grant_type=authorization_code';
-        $result = self::get($weixin_oauth2_url);
 
-        return $type == false ? $result : self::getUserinfo($result['access_token'], $result['openid']);
+        //获取用户数据
+        static::$getOpenIdUrl = str_replace('APPID',$appid,static::$getOpenIdUrl);
+        static::$getOpenIdUrl = str_replace('SECRET',$appSecret,static::$getOpenIdUrl);
+        static::$getOpenIdUrl = str_replace('CODE',$code,static::$getOpenIdUrl);
+
+        $result = self::get(static::$getOpenIdUrl);
+
+        return $type == false ? $result : self::userinfo($result['access_token'], $result['openid']);
     }
 
 
@@ -53,11 +67,14 @@ class User extends Base
      * @param string $openid   用户openid
      * @return array
      */
-    public static function getUserinfo($access_token, $openid)
+    public static function userInfo($access_token, $openid)
     {
         (empty($access_token) or empty($openid)) && self::error('getOpenid()方法设置参数~ !');
-        $weixin_userinfo = 'https://api.weixin.qq.com/sns/userinfo?access_token=' . $access_token . '&openid=' . $openid . '&lang=zh_CN';
-        return self::get($weixin_userinfo);
+
+        static::$getUserInfoUrl = str_replace('ACCESS_TOKEN',$access_token,static::$getUserInfoUrl);
+        static::$getUserInfoUrl = str_replace('OPENID',$openid,static::$getUserInfoUrl);
+
+        return self::get(static::$getUserInfoUrl);
     }
 
 }

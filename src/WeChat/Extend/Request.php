@@ -49,10 +49,11 @@ class Request
      */
     public static function request(string $method,string $url, $params = []):array
     {
-        $isHttp = strpos($url,'https') ?  true : false;
-        if (!in_array(strtolower($method),static::$methods)) Json::error('请求类型错误~');
+        $method = strtolower($method);
+        $isHttp = stristr($url,'https') ?  true : false;
+        if (!in_array($method,static::$methods)) Json::error('请求类型错误~');
         if ($method === 'get' and !empty($params)) $url .= static::ToUrlParams($params);
-        return static::curl_request($url,$isHttp,strtolower($method),$params);
+        return static::curl_request($url,$isHttp,$method,$params);
     }
 
     /**
@@ -89,7 +90,14 @@ class Request
         $url_status = curl_getinfo($ch);
         /****************      关闭连接 并 返回数据    ******************/
         curl_close($ch);
-        return intval($url_status["http_code"]) == 200 ? json_decode($result, true) : false;
+
+        if (intval($url_status["http_code"]) == 200){
+            if (json_decode($result,true) != false){
+                return json_decode($result,true);
+            }
+            return $result;
+        }
+        return false;
     }
 
 

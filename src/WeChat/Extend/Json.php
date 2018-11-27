@@ -33,19 +33,19 @@ class Json extends \Exception
      * @param array $data 返回data数据
      * @param array $options 多选主参数
      */
-    public static function success(string $msg = '请求成功', array $data = [],$options = [])
+    public static function success(string $msg = '请求成功', array $data = [])
     {
-        self::return_abnormal(200, $msg, $data,$options);
+        self::return_abnormal(200, $msg, $data);
     }
 
+
     /**
-     * [return_abnormal 输出异常]
-     * @param  [type] $code [状态码]
-     * @param  [type] $msg  [原因]
-     * @param  array  $data [输出数据]
-     * @param array $options
+     * 输出JSON
+     * @param int $code 状态码
+     * @param string $msg   原因
+     * @param array $data   输出数据
      */
-    public static function return_abnormal($code, $msg, $data = [],$options = [])
+    public static function return_abnormal(int $code,string $msg,array $data = [])
     {
         $code_state = $code == 200 ? 'OK' : 'Bad Request';
         $param      = [
@@ -53,7 +53,7 @@ class Json extends \Exception
             'msg'  => $msg,
             'data' => $data,
         ];
-        $param = array_merge($param,$options);
+
         header("HTTP/1.1 " . $code . " " . $code_state);
         header('Content-Type:application/json;charset=utf-8');
         if ($param !== null) {

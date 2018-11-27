@@ -17,8 +17,6 @@
 
 ~~~
 
-    Github ：git@github.com:china-wangyu/WeChat.git
-    Coding ：git@github.com:china-wangyu/WeChat.git
     码云   ：git@github.com:china-wangyu/WeChat.git
 
 ~~~
@@ -71,6 +69,8 @@ WeChat         模块目录
         
         ├─QrCode.php             微信生成二维码
         
+        ├─Menu.php               微信菜单
+        
 ├─ Extend         依赖目录
 
          ├─File.php                 文件存储类。
@@ -86,142 +86,129 @@ WeChat         模块目录
 ## 微信用户 `User`
 
 ### 微信授权、获取 `code`
-
 ~~~
     * [code 重载http,获取微信授权]
     * @param  string   $appid           [微信公众号APPID]
 
-    \WeChat\User::code('微信appid');  # 重载微信授权
-
+    \WeChat\Core\User::code('微信appid');  # 重载微信授权
 ~~~
 
 
 ### 微信用户 `openid`
-
 ~~~
 
-    * [getOpenid 获取用户 OPENID]
+    * [openid 获取用户 OPENID]
     * @param  string  $code                         [微信授权CODE]
     * @param  string  $appid                        [微信appid]
     * @param  string  $appSecret                    [微信appSecret]
     * @param  boolen  $type                         [true:获取用户信息  false:用户openid]
     * @return [array] [用户信息 用户openid]
 
-    \WeChat\User::getOpenid(input('get.code'), '微信appid', '微信appSecret');
-
+    \WeChat\Core\User::openid(input('get.code'), '微信appid', '微信appSecret');
 ~~~
+
 
 ### 微信用户信息 `userinfo` (1种： 没有获取`openid`时)
-
 ~~~
 
-    * [getOpenid 获取用户 OPENID]
+    * [openid 获取用户 OPENID]
     * @param  string  $code                         [微信授权CODE]
     * @param  string  $appid                        [微信appid]
     * @param  string  $appSecret                    [微信appSecret]
     * @param  boolen  $type                         [true:获取用户信息  false:用户openid]
     * @return [array] [用户信息 用户openid]
 
-    \WeChat\User::getOpenid('获取GET方式的参数code', '微信appid', '微信appSecret', true);
-
+    \WeChat\Core\User::openid('获取GET方式的参数code', '微信appid', '微信appSecret', true);
 ~~~
+
 
 ### 微信用户信息 `userinfo` (2种： 获取`openid`时)
-
 ~~~
 
-    * [getUserinfo 获取用户信息]
+    * [userInfo 获取用户信息]
     * @param  [type] $access_token   [授权获取用户关键参数：access_token]
     * @param  [type] $openid         [用户openid]
 
-    \WeChat\User::getUserinfo($access_token, $openid);
-
+    \WeChat\Core\User::userInfo($access_token, $openid);
 ~~~
 
 
 ## 微信 `Token`
 
 ### 获取 `access_token`
-
 ~~~
 
-    * [getToken 获取微信access_token]
+    * [gain 获取微信access_token]
     * @param  string   $appid                 [微信AppID]
     * @param  string   $appSecret             [微信AppSecret]
     * @return [string] [微信access_token]
 
-    \WeChat\Token::getToken('微信appid', '微信appSecret');  # 获取微信access_token
-
+    \WeChat\Core\Token::gain('微信appid', '微信appSecret');  # 获取微信access_token
 ~~~
 
 
 ## 微信 `Ticket`
 
 ### 微信 `jsapi_ticket`
-
 ~~~
 
-    * [getTicket 微信jsapi_ticket]
+    * [gain 微信jsapi_ticket]
     * @param  string   $access_token          [微信token]
     * @return [string] [微信jsapi_ticket]
 
-    \WeChat\Ticket::getTicket('微信普通token');
-
+    \WeChat\Core\Ticket::gain('微信普通token');
 ~~~
+
 
 ### 微信 `JDK` 签名
-
 ~~~
 
-    * [getSign 获取微信JSDK]
+    * [sign 获取微信JSDK]
     * @param  [string] $ticket        [获取微信JSDK签名]
     * @return [array]  [微信JSDK]
 
-    \WeChat\Ticket::getSign('微信jsapi_ticket');
-
+    \WeChat\Core\Ticket::sign('微信jsapi_ticket');
 ~~~
 
-## 微信 `Template`
 
-### 微信 `getAllTemplate`
+## 微信模板消息 `Template`
 
+### 获取所有模板 `gain`
 ~~~
 
-    * [getAllTemplate 获取所有消息模板内容]
+    * [gain 获取所有消息模板内容]
     * @param  string $accessToken    [微信token]
     * @return [type] [description]
 
-    \WeChat\Template::getAllTemplate('微信token');
-
+    \WeChat\Core\Template::gain('微信token');
 ~~~
 
-## 微信 `Send`
 
-### 微信 `sendKeyWord`
+## 微信推送 `Send`
 
+### 关键字推送 `keyWord`
 ~~~
 
-    * [sendKeyWord 关键字回复]
+    * [keyWord 关键字回复]
     * @param  array           $paramObj       [参数数组]
     * @param  array           $postObj        [微信对象]
     * @param  boolean         $template       [关键字模板 图文：true | 文本： false]
     * @return [string|boolen] [description]
 
-    \WeChat\Send::sendKeyWord($paramObj = [], $postObj = [], $template = false);
+    \WeChat\Core\Send::keyWord($paramObj = [], $postObj = [], $template = false);
 
     例如：
 
     $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', ExtendXML_NOCDATA);
     $paramObj['content'] = '来啊~';
-    \WeChat\Send::sendKeyWord($paramObj, $postObj);
-
+    \WeChat\Core\Send::keyWord($paramObj, $postObj);
 ~~~
 
-### 微信 `sendMsg`
 
+### 模板消息推送 `msg`
 ~~~
 
-    * [sendMsg 发送模板消息]
+    * [msg 发送模板消息]
     * @param  string $accessToken [微信token]
     * @param  string $templateid [模板ID]
     * @param  string $openid     [用户openid]
@@ -230,15 +217,26 @@ WeChat         模块目录
     * @param  string $topcolor   [微信top颜色]
     * @return [ajax] [boolen]
 
-    \WeChat\Send::sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000');
-
+    \WeChat\Core\Send::msg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000');
 ~~~
 
-### 微信 `sendMenu`
+## 微信菜单 `Menu`
 
+### 获取菜单 `gain`
 ~~~
 
-    * [send_menu 生成菜单]
+    * [gain 获取菜单]
+    * @param  string $accessToken [微信token]                              [菜单内容 ]
+    * @return [array] [微信返回值：状态值数组]
+
+    \WeChat\Core\Menu::gain($accessToken = '', $menu = []);
+~~~
+
+
+### 设置菜单 `set`
+~~~
+
+    * [set 生成菜单]
     * @param  string $accessToken [微信token]
     * 例如：$menu =[
     *     'menu_name'=> '掌上商城',
@@ -253,14 +251,26 @@ WeChat         模块目录
     * @param  array   $menu                                  [菜单内容 ]
     * @return [array] [微信返回值：状态值数组]
 
-    \WeChat\Send::sendMenu($accessToken = '', $menu = []);
-
+    \WeChat\Core\Menu::set( array $menu = [], $accessToken = '');
 ~~~
+
 
 ## 二维码 `Qrcode`
 
-### 生成二维码文件 `file`
+### 微信带参二维码 `url`
+~~~
 
+    /**
+     * 创建微信二维码生成
+     * @param string $scene_str 参数字符
+     * @param string $scene_str_prefix 参数前缀
+     * @return array|bool|string
+     */
+    \WeChat\Core\QrCode::createWeChatQrCode(string $scene_str = 'ssasd',string $scene_str_prefix = 'wene_')
+~~~
+
+
+### 创建二维码 `create`
 ~~~
 
      /**
@@ -295,8 +305,8 @@ WeChat         模块目录
             $qrocde = \WeChat\Core\QrCode::create('二维码内容','文件存放路径');
 ~~~
 
-### 生成二维码链接 `url`
 
+### 生成二维码链接 `url`
 ~~~
 
      * [url 生成二维码链接]
@@ -306,14 +316,11 @@ WeChat         模块目录
      * @param  string $height [二维码高度]
      * @return [string]         [参数加密后的二维码链接]
 
-    \WeChat\Qrcode::url($url = '', $param = [], $width = '300', $height = '300');
-
-
-
+    \WeChat\Core\QrCode::url($url = '', $param = [], $width = '300', $height = '300');
 ~~~
 
-### 生成二维码 `<img>` 标签  `html`
 
+### 生成二维码 `<img>` 标签  `html`
 ~~~
 
      * [html 生成二维码html <img src=''> 标签]
@@ -323,17 +330,13 @@ WeChat         模块目录
      * @param  string $height [二维码高度]
      * @return [string]         [二维码<img src=''> 标签]
 
-    \WeChat\Qrcode::html($url = '', $param = [], $width = '300', $height = '300');
-
-
-
+    \WeChat\Core\QrCode::html($url = '', $param = [], $width = '300', $height = '300');
 ~~~
+
 
 ##  文件参数储存 `File`
-
 ~~~
 
-     
       * 文件参数储存，可扩展
       * @param string $var  key
       * @param array $val value
@@ -343,9 +346,6 @@ WeChat         模块目录
     
     // 取值
     \WeChat\Extend\File::param('key');
-
-
-
 ~~~
 
 

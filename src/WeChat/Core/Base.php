@@ -2,6 +2,7 @@
 /**
  * Created by wene. Date: 2018/9/20
  */
+
 namespace WeChat\Core;
 
 /**
@@ -11,4 +12,6 @@ namespace WeChat\Core;
 abstract class Base
 {
     use \WeChat\Extend\Tool;
+
+
 }

@@ -2,6 +2,7 @@
 /**
  * Created by wene. Date: 2018/9/20
  */
+
 namespace WeChat\Core;
 
 /**
@@ -10,53 +11,68 @@ namespace WeChat\Core;
  */
 class Ticket extends Base
 {
+    // 微信ticket (jsapi)
+    private static $getTicketUrl = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=ACCESS_TOKEN&type=jsapi';
 
     /**
-     * [getTicket 设置微信jsapi_ticket]
-     * @param  string   $access_token          [微信普通token]
-     * @return [string] [微信jsapi_ticket]
+     * 设置微信ticket
+     * @param string $accessToken 微信普通token
+     * @return bool 微信 ticket|false
      */
-    public static function getTicket($accessToken = '')
+    public static function gain(string $accessToken = '')
     {
-        /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = Token::getToken();
+        // 验证微信普通token
+        empty($accessToken) && $accessToken = Token::gain();
         $param = \WeChat\Extend\File::param('ticket');
         if ($param === null or (isset($param['time']) and time() - $param['time'] > 7150)) {
-            $wechat_jsapi_ticket_url       = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $accessToken;
-            $result                        = self::get($wechat_jsapi_ticket_url);
-            if(isset($result['ticket'])){
-                \WeChat\Extend\File::param('ticket',$result);
+
+            //
+            static::$getTicketUrl = str_replace('ACCESS_TOKEN',$accessToken,static::$getTicketUrl);
+            $result = self::get(static::$getTicketUrl);
+
+            if (isset($result['ticket'])) {
+                \WeChat\Extend\File::param('ticket', $result);
                 return $result['ticket'];
-            }else{
+            } else {
                 return false;
             }
+
         } else {
             return $param['ticket'];
         }
 
     }
 
+
     /**
-     * [getSign 获取微信JSDK]
-     * @param  [string] $ticket        [获取微信JSDK签名]
-     * @return [array]  [微信JSDK]
+     * 获取微信JSDK
+     * @param string $ticket 获取微信JSDK签名
+     * @param string $redirect_url 微信JSDK
+     * @return mixed
      */
-    public static function getSign($ticket = '',$redirect_url = '')
+    public static function sign(string $ticket = '', string $redirect_url = '')
     {
-        empty($ticket) && $ticket = self::getTicket();
-        $url              = empty($redirect_url) ? $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'] :$redirect_url;
-        $timestamp        = time();
-        $nonceStr        = self::createNonceStr();
-        $string = 'jsapi_ticket='.$ticket.'&noncestr='.$nonceStr.'&timestamp='.$timestamp.'&url='.$url;
-        $param['rawString']       = $string;
-        $param['signature']       = sha1($param['rawString']);
-        $param['nonceStr']        = $nonceStr;
-        $param['timestamp']       = $timestamp;
-        $param['url']             = $url;
+        empty($ticket) && $ticket = self::gain();
+        $url = empty($redirect_url) ? $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] : $redirect_url;
+        $timestamp = time();
+        $nonceStr = self::createNonceStr();
+        $string = 'jsapi_ticket=' . $ticket . '&noncestr=' . $nonceStr . '&timestamp=' . $timestamp . '&url=' . $url;
+        $param['rawString'] = $string;
+        $param['signature'] = sha1($param['rawString']);
+        $param['nonceStr'] = $nonceStr;
+        $param['timestamp'] = $timestamp;
+        $param['url'] = $url;
         return $param;
     }
 
-    private static function createNonceStr($length = 16) {
+
+    /**
+     * 创建随机字符微信版本
+     * @param int $length
+     * @return string
+     */
+    private static function createNonceStr($length = 16)
+    {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $str = "";
         for ($i = 0; $i < $length; $i++) {

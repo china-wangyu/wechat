@@ -11,26 +11,32 @@ namespace WeChat\Core;
  */
 class Send extends Base
 {
+
+    private static $setMsgUrl = 'https://api.weixin.qq.com/cgi-bin/template/api_set_industry?access_token=ACCESS_TOKEN';
+
     /**
-     * [sendKeyWord 关键字回复]
-     * @param  array $paramObj [参数数组]
-     * @param  array $postObj [微信对象]
-     * @param  boolean $template [关键字模板 图文：true | 文本： false]
-     * @return [string|boolen] [description]
+     * 关键字回复
+     * @param array $paramObj 参数数组
+     * @param array $postObj 微信对象
+     * @param int $type 关键字模板 图文：true | 文本： false
      */
-    public static function sendKeyWord($paramObj = [], $postObj = [], $template = 2)
+    public static function keyWord(array $paramObj, array $postObj, int $type = 2)
     {
-        (empty($paramObj) or empty($postObj)) && self::error('请设置正确的参数 $paramObj or $postObj~ !');
-        $templateString = self::getKeyWordTemplate($template);
-        $fromUsername = $postObj->FromUserName;
-        $toUsername = $postObj->ToUserName;
+        // 验证参数
+        if (empty($paramObj) or empty($postObj)) {
+            self::error('请设置正确的参数 $paramObj or $postObj~ !');
+        }
+        $templateString = self::getKeyWordTemplate($type);
+        $fromUsername = $postObj['FromUserName'];
+        $toUsername = $postObj['ToUserName'];
         $time = time();
-        switch ($template) {
+        switch ($type) {
             case 1:
                 if (empty($paramObj['title']) or empty($paramObj['content']) or empty($paramObj['imgurl']) or empty($paramObj['jumpurl'])) {
                     self::error('请设置正确的参数值~!');
                 }
-                $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, $paramObj['title'], $paramObj['content'], $paramObj['imgurl'], $paramObj['jumpurl']);
+                $resultStr = sprintf($templateString, $fromUsername, $toUsername, $time, $paramObj['title'],
+                    $paramObj['content'], $paramObj['imgurl'], $paramObj['jumpurl']);
                 break;
             case 2:
                 empty($paramObj['content']) && self::error('请设置正确的参数值~!');
@@ -40,14 +46,48 @@ class Send extends Base
                 $resultStr = sprintf($templateString, $fromUsername, $time);
                 break;
         }
-
         echo $resultStr;
+        die;
     }
 
+
     /**
-     * [getKeyWordTemplate 获取模板关键字模板]
-     * @param  boolean $type [图文：true | 文本： false]
-     * @return [string] [模板内容]
+     * 发送模板消息
+     * @param string $accessToken
+     * @param string $templateId 模板ID
+     * @param string $openid 用户openid
+     * @param array $data 模板参数
+     * @param string $url 模板消息链接
+     * @param string $topColor 微信top颜色
+     * @return array
+     */
+    public static function msg(string $accessToken, string $templateId, string $openid, array $data = [], string $url = '', string $topColor = '#FF0000')
+    {
+        // 验证微信普通token
+        empty($accessToken) && $accessToken = Token::gain();
+
+        // 检测参数
+        if (empty($data) or empty($openid) or empty($templateId)) {
+            self::error('请设置正确的参数 $template or $value~ !');
+        }
+
+        // 准备数据
+        $template['template_id'] = $templateId;
+        $template['touser'] = $openid;
+        $template['url'] = empty($url) ? '' : $url;
+        $template['topcolor'] = empty($topColor) ? '' : $topColor;
+        $template['data'] = $data;
+        $send_url = str_replace('ACCESS_TOKEN', $accessToken, static::$setMsgUrl);
+
+        // 发送请求，并返回
+        return self::post($send_url, json_encode($template, JSON_UNESCAPED_UNICODE));
+    }
+
+
+    /**
+     * 获取模板关键字模板
+     * @param int $type
+     * @return string
      */
     private static function getKeyWordTemplate($type = 1)
     {
@@ -92,77 +132,5 @@ class Send extends Base
         }
     }
 
-    /**
-     * [sendMsg 发送模板消息]
-     * @param  string $templateid [模板ID]
-     * @param  string $openid [用户openid]
-     * @param  array $data [模板参数]
-     * @param  string $url [模板消息链接]
-     * @param  string $topcolor [微信top颜色]
-     * @return [ajax] [boolen]
-     */
-    public static function sendMsg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000')
-    {
-        /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = Token::getToken();
-        (empty($data) or empty($openid) or empty($templateid)) && self::error('请设置正确的参数 $template or $value~ !');
 
-        $template['template_id'] = $templateid;
-        $template['touser'] = $openid;
-        $template['url'] = empty($url) ? '' : $url;
-        $template['topcolor'] = empty($topcolor) ? '' : $topcolor;
-        $template['data'] = $data;
-        $send_url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
-        return self::post($send_url, json_encode($template, JSON_UNESCAPED_UNICODE));
-    }
-
-    /**
-     * [send_menu 生成菜单]
-     * 例如：$menu =[
-     *     'menu_name'=> '掌上商城',
-     *     'menu_status'=> 0; //0表示view
-     *     'menu_url' => 'http://www.baidu.com',
-     *     'chind' => [
-     *         'menu_name'=> '掌上商城',
-     *         'menu_status'=> 0; //0表示view
-     *         'menu_url' => 'http://www.baidu.com',
-     *         ],
-     *     ];
-     * @param  array $menu [菜单内容 ]
-     * @return [array] [微信返回值：状态值数组]
-     */
-    public static function sendMenu($accessToken = '', $menu = [])
-    {
-        /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = Token::getToken();
-        (!is_array($menu) or count($menu) == 0) && self::error('请设置正确的参数 $menu ~ !');
-
-        $format_param['button'] = self::format_param($menu);
-        $send_url = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $accessToken;
-        return self::post($send_url, json_encode($format_param, JSON_UNESCAPED_UNICODE));
-    }
-
-    /**
-     * [format_param 格式化菜单数组]
-     * @param  [array] $menu      [数组]
-     * @return [array] [数组]
-     */
-    private static function format_param($menu)
-    {
-        $button = [];
-        foreach ($menu as $key => $val) {
-            $button[$key]['name'] = $val['menu_name'];
-            if (empty($val['chind'])) {
-                $button[$key]['type'] = $val['menu_status'] == 0 ? 'view' : 'click';
-                $button[$key][$val['menu_status'] == 0 ? 'url' : 'key'] = $val['menu_url'];
-            } else {
-                foreach ($val['chind'] as $chind => $value) {
-                    $button[$key]['sub_button'][$chind]['name'] = $value['menu_name'];
-                    $button[$key]['sub_button'][$chind]['type'] = $value['menu_status'] == 0 ? 'view' : 'click';
-                    $button[$key]['sub_button'][$chind][$chind['menu_status'] == 0 ? 'url' : 'key'] = $value['menu_url'];
-                }
-            }
-        }
-        return $button;
-    }
 }

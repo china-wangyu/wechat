@@ -2,6 +2,7 @@
 /**
  * Created by wene. Date: 2018/9/20
  */
+
 namespace WeChat\Core;
 
 /**
@@ -11,10 +12,12 @@ namespace WeChat\Core;
 class Template extends Base
 {
 
+    private static $getTemplateUrl = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=TOKEN';
+
     /**
-     * [initTemplate 格式化消息模板内容]
-     * @param  array   $template              [模板内容]
-     * @return [array] [消息模板内容]
+     * 格式化消息模板内容
+     * @param array $template 模板内容
+     * @return array    消息模板内容
      */
     public static function initTemplate($template = [])
     {
@@ -30,16 +33,16 @@ class Template extends Base
     }
 
     /**
-     * [getAllTemplate 获取所有消息模板内容]
-     * @param  string $accessToken    [微信token]
-     * @return [type] [description]
+     * 获取所有消息模板内容
+     * @param string $accessToken 微信token
+     * @return array
      */
-    public static function getAllTemplate($accessToken = '')
+    public static function gain(string $accessToken = '')
     {
-        /****************      验证微信普通token   ******************/
-        empty($accessToken) && $accessToken = Token::getToken();
-        $template_url = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=' . $accessToken;
-        $result = self::get($template_url);
+        // 验证微信普通token
+        empty($accessToken) && $accessToken = Token::gain();
+        static::$getTemplateUrl = str_replace('TOKEN',$accessToken,static::$getTemplateUrl);
+        $result = self::get(static::$getTemplateUrl);
         foreach ($result['template_list'] as $key) {
             $templateObj[] = self::initTemplate($key);
         }
@@ -47,11 +50,11 @@ class Template extends Base
     }
 
     /**
-     * [trim_template 获取模板需要的参数name]
-     * @param  [type] $string [过滤包含参数的字符串]
-     * @return [type]         [不带其它字符的参数数组]
+     * 获取模板需要的参数name
+     * @param string $string 过滤包含参数的字符串
+     * @return array    不带其它字符的参数数组
      */
-    private static function trim_template($string)
+    private static function trim_template(string $string)
     {
         $string = preg_replace('/([\x80-\xff]*)/i', '', $string);
         $trim = array(" ", "　", "\t", "\n", "\r", '.DATA', '}}');
