@@ -40,13 +40,6 @@
     composer update
 
 
->### 使用 `源码` 安装
-
-#### **直接下载到项目目录 `vendor/` 下，文件夹需以 `WeChat` 命名，也可自行修改**
-
-
-
-
 ## 接口使用说明
 
 ### 接口目录
@@ -257,7 +250,7 @@ WeChat         模块目录
 
 ## 二维码 `Qrcode`
 
-### 微信带参二维码 `url`
+### 微信带参二维码 `wechat`
 ~~~
 
     /**
@@ -266,7 +259,7 @@ WeChat         模块目录
      * @param string $scene_str_prefix 参数前缀
      * @return array|bool|string
      */
-    \WeChat\Core\QrCode::createWeChatQrCode(string $scene_str = 'ssasd',string $scene_str_prefix = 'wene_')
+    \WeChat\Core\QrCode::wechat(string $scene_str = 'ssasd',string $scene_str_prefix = 'wene_')
 ~~~
 
 
@@ -303,34 +296,6 @@ WeChat         模块目录
             
             2. 生成二维码文件
             $qrocde = \WeChat\Core\QrCode::create('二维码内容','文件存放路径');
-~~~
-
-
-### 生成二维码链接 `url`
-~~~
-
-     * [url 生成二维码链接]
-     * @param  [type] $url    [二维码网址]
-     * @param  array  $param  [二维码参数]
-     * @param  string $width  [二维码宽度]
-     * @param  string $height [二维码高度]
-     * @return [string]         [参数加密后的二维码链接]
-
-    \WeChat\Core\QrCode::url($url = '', $param = [], $width = '300', $height = '300');
-~~~
-
-
-### 生成二维码 `<img>` 标签  `html`
-~~~
-
-     * [html 生成二维码html <img src=''> 标签]
-     * @param  [type] $url    [二维码网址]
-     * @param  array  $param  [二维码参数]
-     * @param  string $width  [二维码宽度]
-     * @param  string $height [二维码高度]
-     * @return [string]         [二维码<img src=''> 标签]
-
-    \WeChat\Core\QrCode::html($url = '', $param = [], $width = '300', $height = '300');
 ~~~
 
 

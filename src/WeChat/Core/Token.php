@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by wene. Date: 2018/9/20
+ * Created by china_wangyu@aliyun.com. Date: 2018/11/26 Time: 17:19
  */
 
 namespace WeChat\Core;
@@ -11,6 +11,7 @@ namespace WeChat\Core;
  */
 class Token extends Base
 {
+    // 获取token API地址
     private static $getTokenUrl = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
 
     /**

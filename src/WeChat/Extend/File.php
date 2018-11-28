@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by wene. Date: 2018/9/20
+ * Created by china_wangyu@aliyun.com. Date: 2018/11/26 Time: 17:19
  */
 
 namespace WeChat\Extend;
@@ -19,9 +19,9 @@ class File
 
     /**
      * 存储对象文件，可扩展
-     * @param string $var  key
-     * @param array $val value
-     * @return mixed
+     * @param string $var
+     * @param array $val
+     * @return null
      */
     public static function param(string $var, array $val = [])
     {
@@ -50,8 +50,9 @@ class File
 
     /**
      * 支付日志
-     * [paylog description]
-     * @return [type] [description]
+     * @param string $type
+     * @param array $param
+     * @return mixed
      */
     public static function paylog(string $type = 'wechat', array $param = [])
     {
@@ -63,10 +64,11 @@ class File
         file_put_contents($file_path, $data, FILE_APPEND);
     }
 
+
     /**
-     * [mkdir 创建日志类型文件]
-     * @param  string $type [description]
-     * @return [type]       [description]
+     * 创建日志类型文件
+     * @param string $type
+     * @return string
      */
     private static function mkdir(string $type = 'param')
     {

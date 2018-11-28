@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by wene. Date: 2018/9/20
+ * Created by china_wangyu@aliyun.com. Date: 2018/11/26 Time: 17:19
  */
 
 namespace WeChat\Core;
@@ -11,7 +11,7 @@ namespace WeChat\Core;
  */
 class Send extends Base
 {
-
+    // 微信发送模板消息API
     private static $setMsgUrl = 'https://api.weixin.qq.com/cgi-bin/template/api_set_industry?access_token=ACCESS_TOKEN';
 
     /**

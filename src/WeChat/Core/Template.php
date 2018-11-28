@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by wene. Date: 2018/9/20
+ * Created by china_wangyu@aliyun.com. Date: 2018/11/26 Time: 17:19
  */
 
 namespace WeChat\Core;
@@ -11,7 +11,7 @@ namespace WeChat\Core;
  */
 class Template extends Base
 {
-
+    // 微信获取所有模板api
     private static $getTemplateUrl = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=TOKEN';
 
     /**

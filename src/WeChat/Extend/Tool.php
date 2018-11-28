@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by wene. Date: 2018/9/20
+ * Created by china_wangyu@aliyun.com. Date: 2018/11/26 Time: 17:19
  */
 
 namespace WeChat\Extend;
@@ -20,7 +20,7 @@ trait Tool
     public static function success($msg = '操作成功', array $data = [])
     {
         if (is_array($msg)){
-            Json::success('操作成功', $data);
+            Json::success('操作成功~', $data);
         }
         Json::success($msg, $data);
     }
@@ -109,7 +109,7 @@ trait Tool
             case 'w': # 匹配包括下划线的任何单词字符。等价于“[A-Za-z0-9_]”。
                 return static::getGapStrByStr($dStr.$sStr.$wStr,$strLen - $strBlurLen).$strSuffix;
                 break;
-            default :
+            default : # 默认大小写字母
                 return static::getGapStrByStr($sStr,$strLen - $strBlurLen).$strSuffix;
                 break;
         }
