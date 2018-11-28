@@ -125,6 +125,16 @@ WeChat         模块目录
     \WeChat\Core\User::userInfo($access_token, $openid);
 ~~~
 
+### 微信用户信息 `newuserinfo` (3种： 获取`access_token`时)
+~~~
+
+    * [userInfo 获取用户信息]
+    * @param  [type] $access_token   [普通access_token]
+    * @param  [type] $openid         [用户openid]
+
+    \WeChat\Core\User::newUserinfo($access_token, $openid);
+~~~
+
 
 ## 微信 `Token`
 
@@ -255,11 +265,12 @@ WeChat         模块目录
 
     /**
      * 创建微信二维码生成
-     * @param string $scene_str 参数字符
-     * @param string $scene_str_prefix 参数前缀
+     * @param string $accessToken 授权TOKEN
+     * @param string $scene_str 字符串
+     * @param string $scene_str_prefix  字符串前缀
      * @return array|bool|string
      */
-    \WeChat\Core\QrCode::wechat(string $scene_str = 'ssasd',string $scene_str_prefix = 'wene_')
+    \WeChat\Core\QrCode::wechat(string $accessToken,string $scene_str, string $scene_str_prefix = 'wene_')
 ~~~
 
 

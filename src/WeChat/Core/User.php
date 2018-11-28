@@ -20,12 +20,15 @@ class User extends Base
     // 第三步：拉取用户信息(需scope为 snsapi_userinfo)
     private static $getUserInfoUrl = 'https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN';
 
+    // 第四步：拉取用户信息(普通access_token版)
+    private static $getUserInfoUrlByToken = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN';
+
     /**
      * [code 重载http,获取微信授权]
      * @param  string $appid [微信公众号APPID]
      * @return [header] [重载链接]
      */
-    public static function code($appid = '')
+    public static function code(string $appid)
     {
         empty($appid) && self::error('请设置管理端微信公众号开发者APPID ~ !');
         //当前域名
@@ -44,7 +47,7 @@ class User extends Base
      * @param bool $type    true:获取用户信息 | false:用户openid
      * @return array    用户信息|用户openid
      */
-    public static function openid($code, $appid, $appSecret, $type = false)
+    public static function openid(string $code, string $appid,string $appSecret,bool $type = false)
     {
         //验证参数
         (empty($appid) or empty($appSecret)) && self::error('请设置管理端微信公众号开发者APPID 和 APPSECRET~ !');
@@ -62,12 +65,12 @@ class User extends Base
 
 
     /**
-     * 获取用户信息
+     * 获取用户信息(通过code换取网页授权access_token版)
      * @param string $access_token 授权获取用户关键参数：access_token
      * @param string $openid   用户openid
      * @return array
      */
-    public static function userInfo($access_token, $openid)
+    public static function userInfo(string $access_token, string $openid)
     {
         (empty($access_token) or empty($openid)) && self::error('getOpenid()方法设置参数~ !');
 
@@ -77,4 +80,19 @@ class User extends Base
         return self::get(static::$getUserInfoUrl);
     }
 
+    /**
+     * 获取用户信息(普通ACCESS_TOKEN获取版)
+     * @param string $access_token 普通access_token
+     * @param string $openid   用户openid
+     * @return array
+     */
+    public static function newUserInfo(string $access_token,string $openid)
+    {
+        (empty($access_token) or empty($openid)) && self::error('getOpenid()方法设置参数~ !');
+
+        static::$getUserInfoUrlByToken = str_replace('ACCESS_TOKEN',$access_token,static::$getUserInfoUrlByToken);
+        static::$getUserInfoUrlByToken = str_replace('OPENID',$openid,static::$getUserInfoUrlByToken);
+
+        return self::get(static::$getUserInfoUrlByToken);
+    }
 }

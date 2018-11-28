@@ -85,11 +85,12 @@ class QrCode extends Base
 
     /**
      * 创建微信二维码生成
+     * @param string $accessToken 授权TOKEN
      * @param string $scene_str 字符串
      * @param string $scene_str_prefix  字符串前缀
-     * @return array|bool|string
+     * @return array|bool|mixed
      */
-    public static function wechat(string $scene_str = 'ssasd', string $scene_str_prefix = 'wene_')
+    public static function wechat(string $accessToken,string $scene_str, string $scene_str_prefix = 'wene_')
     {
         $result = false;
         // 验证微信普通token
@@ -107,7 +108,6 @@ class QrCode extends Base
             // 获取对应数据
             $result = self::post($setQrCodeUrl, $qrCodeParam);
             if (isset($result['ticket'])) {
-                $result = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' . $result['ticket'];
                 $result = str_replace('JSAPI_TICKET',$result['ticket'],static::$showqrcodeUrl);
             }
         }
