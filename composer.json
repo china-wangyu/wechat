@@ -18,8 +18,7 @@
     }
   ],
   "require":{
-    "PHP" : ">= 7.2.0",
-    "endroid/qr-code" : ">=3.4"
+    "PHP" : ">= 7.2.0"
   },
   "minimum-stability": "dev",
   "autoload": {
