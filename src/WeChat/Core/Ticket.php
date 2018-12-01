@@ -19,21 +19,28 @@ class Ticket extends Base
      * @param string $accessToken 微信普通token
      * @return bool 微信 ticket|false
      */
-    public static function gain(string $accessToken)
+    public static function gain(string $accessToken = '')
     {
+        // 验证微信普通token
+        empty($accessToken) && $accessToken = Token::gain();
         $param = \WeChat\Extend\File::param('ticket');
         if ($param === null or (isset($param['time']) and time() - $param['time'] > 7150)) {
 
-            // 准备数据
+            //
             static::$getTicketUrl = str_replace('ACCESS_TOKEN',$accessToken,static::$getTicketUrl);
             $result = self::get(static::$getTicketUrl);
 
-            // 返回数据
-            isset($result['ticket']) && \WeChat\Extend\File::param('ticket', $result);
-            return $result['ticket'];
+            if (isset($result['ticket'])) {
+                \WeChat\Extend\File::param('ticket', $result);
+                return $result['ticket'];
+            } else {
+                return false;
+            }
+
         } else {
             return $param['ticket'];
         }
+
     }
 
 
@@ -43,8 +50,9 @@ class Ticket extends Base
      * @param string $redirect_url 微信JSDK
      * @return mixed
      */
-    public static function sign(string $ticket, string $redirect_url = '')
+    public static function sign(string $ticket = '', string $redirect_url = '')
     {
+        empty($ticket) && $ticket = self::gain();
         $url = empty($redirect_url) ? $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] : $redirect_url;
         $timestamp = time();
         $nonceStr = self::createNonceStr();

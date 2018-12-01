@@ -23,7 +23,6 @@ class QrCode extends Base
 
     /**
      * 生成二维码
-     * @inheritdoc 文档说明：http://phpqrcode.sourceforge.net/
      * @param string $text 二维码内容
      * @param bool $filePath    二维码储存路径
      * @param string $level 二维码容错机制
@@ -56,7 +55,6 @@ class QrCode extends Base
 
     /**
      * 创建微信带参二维码生成
-     * @inheritdoc 详细文档：https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1443433542
      * @param string $accessToken 授权TOKEN
      * @param string $scene_str 字符串
      * @param string $scene_str_prefix 字符串前缀

@@ -19,7 +19,7 @@ class Template extends Base
      * @param array $template 模板内容
      * @return array    消息模板内容
      */
-    public static function format($template = [])
+    public static function initTemplate($template = [])
     {
         $param = self::trim_template($template['content']);
         $template['param'] = [
@@ -34,14 +34,19 @@ class Template extends Base
 
     /**
      * 获取所有消息模板内容
-     * @inheritdoc 详细文档：https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1433751277
      * @param string $accessToken 微信token
      * @return array
      */
-    public static function gain(string $accessToken)
+    public static function gain(string $accessToken = '')
     {
+        // 验证微信普通token
+        empty($accessToken) && $accessToken = Token::gain();
         static::$getTemplateUrl = str_replace('TOKEN',$accessToken,static::$getTemplateUrl);
-        return self::get(static::$getTemplateUrl);
+        $result = self::get(static::$getTemplateUrl);
+        foreach ($result['template_list'] as $key) {
+            $templateObj[] = self::initTemplate($key);
+        }
+        return $templateObj;
     }
 
     /**

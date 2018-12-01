@@ -24,15 +24,9 @@ class User extends Base
     private static $getUserInfoUrlByToken = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN';
 
     /**
-     * []
-     * @param  string $appid []
-     *
-     */
-
-    /**
-     * code 重载http,获取微信授权
-     * @param string $appid 微信公众号APPID
-     * @header 重载链接获取code
+     * [code 重载http,获取微信授权]
+     * @param  string $appid [微信公众号APPID]
+     * @return [header] [重载链接]
      */
     public static function code(string $appid)
     {

@@ -26,8 +26,9 @@ trait Tool
     }
 
     /**
-     * 接口 json 失败输出
+     * 接口 json 成功输出
      * @param string $msg
+     * @param array $data
      */
     public static function error(string $msg = '操作失败')
     {

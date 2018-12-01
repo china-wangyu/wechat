@@ -6,40 +6,30 @@
 namespace WeChat\Core;
 
 
-/**
- * Class Authorize  微信授权认证类
- * @package WeChat\Core
- */
-abstract class Authorize extends Base implements \WeChat\Extend\Authorize
+class Authorize extends Base implements \WeChat\Extend\Authorize
 {
 
     /**
-     * @var string $token 设置微信的认证字符
+     * 设置微信的认证字符
+     * @var string $token
      */
-    protected $token = 'TOKEN2018';
+    protected $token = 'WangYu';
 
     /**
-     * @var string $appID 公众号appid
+     * 微信的数据集合
+     * @var $config
      */
-    protected $appid = '';
+    protected $config;
 
     /**
-     * @var string $appScret 公众号appSecret
+     * 返回用户数据格式集合
+     * @var array $returnTypes
      */
-    protected $appSecret = '';
+    protected $returnTypes = ['text','image','voice','video','music','news'];
 
     /**
-     * @var array $config 微信的数据集合
-     */
-    protected $config = [];
-
-    /**
-     * @var array $userInfo 微信的数据集合
-     */
-    protected $userInfo = [];
-
-    /**
-     * @var array $returnData   回复用户的消息数据
+     * 回复用户的消息数据
+     * @var array $returnData
      */
     protected $returnData = array(
         'MsgType' => 'text',  // 可选类型[text: 文本|image: 图片|voice: 语音|video: 视频|music: 音乐|news: 图文]
@@ -59,34 +49,35 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
     /**
      * 设置与微信对接的TOKEN凭证字符
      * Authorize constructor.
-     * @param string $token 微信开发模式TOKEN字符串
-     * @param string $appID 微信appid
-     * @param string $appScret 微信appScret
-     * @inheritdoc 详细文档：https://mp.weixin.qq.com/advanced/advanced?action=dev&t=advanced/dev&token=1833550478&lang=zh_CN
+     * @param string $token
      */
-    public function __construct(string $token,string $appID,string $appScret)
+    public function __construct(string $token = '')
     {
         if (!empty($token)) $this->token = $token;
-        if (!empty($appID)) $this->appid = $token;
-        if (!empty($appScret)) $this->appSecret = $token;
     }
 
     /**
      * 微信授权
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
-    final public function index()
+    public function index()
     {
         // 这里填写的是你在微信上设置的TOKEN，但是必须保证与微信公众平台-接口配置信息一致
         $echoStr = $_REQUEST['echostr'];
+        if (!isset($echoStr)) {
+            $this->responseMsg();
+        } else {
+            $this->valid();
+        }
 
-        // 验证数据或回复用户
-        (!isset($echoStr)) ? $this->responseMsg() : $this->valid();
     }
 
     /**
      * 若确认此次GET请求来自微信服务器，请原样返回echostr参数内容，则接入生效，否则接入失败。
      */
-    final protected function valid()
+    private function valid()
     {
         $echoStr = $_REQUEST['echostr'];
         if ($this->checkSignature()) {
@@ -99,7 +90,7 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
      * 开发者通过检验signature对请求进行校验
      * @return bool
      */
-    final protected function checkSignature()
+    private function checkSignature()
     {
         $tmpArr = array($this->token, trim($_REQUEST['timestamp']), trim($_REQUEST['nonce']));
         sort($tmpArr);
@@ -109,42 +100,45 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
 
     /**
      * 公众号的消息推送，回复
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
-    final protected function responseMsg()
+    private function responseMsg()
     {
-        try{
-            $postStr = file_get_contents("php://input");
-            if (!empty($postStr)) {
-                $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
-
-                // 微信提醒数组
-                $this->config = json_decode(json_encode($postObj), true);
-
-                // 普通授权token
-                $resToken = Token::gain($this->appid, $this->appSecret);
-
-                // 微信用户信息
-                $this->userInfo = User::newUserInfo($resToken, $this->config['FromUserName']);
-
-                // 逻辑操作，需要更改逻辑的就在这个方法咯~
-                $this->handle();
-
-                // 被动发送消息
-                Send::trigger($this->config,$this->returnData);
+        $postStr = file_get_contents("php://input");
+        if (!empty($postStr)) {
+            $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+            $this->config = json_decode(json_encode($postObj), true); // 微信提醒数组
+            $paramObj = [];  // 消息数组
+            $resToken = Token::gain(config('DHKJ_WECHAT.app_id'), config('DHKJ_WECHAT.app_secret')); // token
+            $userInfo = User::newUserInfo($resToken, $this->config['FromUserName']); // 微信用户信息
+            switch ($this->config) {
+                case  $this->config['MsgType'] == 'event' :
+                    $this->sendEventMsg($paramObj, $this->config, $userInfo);
+                    break;
+                case !empty(trim($this->config['Content'])):
+                    $this->sendKeywordMsg($paramObj, $this->config, $userInfo);
+                    break;
             }
-        }catch (\Exception $exception){}
-        echo '';
-        exit;
+        } else {
+            echo '';
+            exit;
+        }
     }
 
     /**
-     * 首次关注事件
-     * @return mixed|void
+     * 微信事件推送器
+     * @param $paramObj
+     * @param $postArr
+     * @param $userInfo
      */
-    public function follow()
+    private function sendEventMsg($paramObj, $postArr, $userInfo)
     {
-        // TODO: Implement follow() method.
-        $sendMsg = '您好，感谢您关注都汇康健
+        $params = explode('_', trim($postArr['EventKey']));
+        switch ($postArr['Event']) {
+            case $postArr['Event'] == 'subscribe' and !isset($params[1]):
+                $paramObj['content'] = '您好，感谢您关注都汇康健
 
 都汇康健是国内领先的大健康管理及慢病教育运营商，为广大亚健康人群
 及慢病人群提供优质的健康管理服务和慢病教育服务。
@@ -152,59 +146,93 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
 我们在体重管理、睡眠管理、健脑益智、心脑血管等众多领域为国人提供专业的医学教育及科普服务，通过系统的慢病解决方案及专业的医学级健康产品，持续为广大国人创造健康价值，提升生活品质。
 
 健康管理咨询：400-870-9690';
-        $this->text($sendMsg);
+                Send::keyWord($paramObj, $postArr);
+                break;
+            case $postArr['Event'] == 'subscribe' and isset($params[1]):
+                $paramObj['content'] = '扫码关注' . json_encode($postArr);
+                Send::keyWord($paramObj, $postArr);
+                break;
+            case 'user_scan_product_enter_session':
+                $paramObj['content'] = '用户商品扫码' . json_encode($postArr);
+                Send::keyWord($paramObj, $postArr);
+                break;
+            case 'CLICK':
+                $this->sendClickMsg($paramObj, $postArr, $userInfo);
+                break;
+            case 'SCAN':
+                $paramObj['content'] = '扫码进入' . json_encode($postArr);
+                Send::keyWord($paramObj, $postArr);
+                break;
+        }
     }
 
     /**
-     * 扫码关注事件
-     * @return mixed|void
+     * 发送关键字消息
+     * @param $paramObj
+     * @param $postArr
+     * @param $userInfo
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
-    public function scanFollow()
+    private function sendKeywordMsg($paramObj, $postArr, $userInfo)
     {
-        // TODO: Implement scanFollow() method.
-        $this->text('扫码关注' . json_encode($this->config));
+        $type = 2;
+        try {
+            $keywordInfo = DoctorWxMenu::where(['name' => trim($postArr['Content'])])
+                ->order('id desc')
+                ->limit(1)
+                ->find();
+            if (empty($keywordInfo)) {
+                $paramObj['content'] = '谢谢您的关心陪伴，系统升级中，给你带来的不便请见谅，爱你，么么哒~' . json_encode($userInfo);
+            } else {
+                if ($keywordInfo['ctype'] == 1 and !empty($keywordInfo['click_img'])) {
+                    $paramObj['title'] = isset($keywordInfo['name']) ? '' : $keywordInfo['name'];
+                    $paramObj['content'] = isset($keywordInfo['click_content']) ? '' : $keywordInfo['click_content'] . json_encode($userInfo);
+                    $paramObj['imgurl'] = isset($keywordInfo['click_img']) ? '' : $keywordInfo['click_img'];
+                    $paramObj['jumpurl'] = isset($keywordInfo['click_url']) ? '' : $keywordInfo['click_url'];
+                    $type = $keywordInfo['ctype'] == 1 and !empty($keywordInfo['click_img']) ? 1 : 2;
+                } else {
+                    $paramObj['content'] = '谢谢您的关心陪伴，系统升级中，给你带来的不便请见谅，爱你，么么哒~' . json_encode($userInfo);
+                }
+            }
+        } catch (\Exception $exception) {
+            $paramObj['content'] = '谢谢您的关心陪伴，系统升级中，给你带来的不便请见谅，爱你，么么哒~' . json_encode($userInfo);
+        }
+        Send::keyWord($paramObj, $postArr, $type);
     }
 
     /**
-     * 点击事件
-     * @return mixed|void
+     * 点击事件发送消息
+     * @param $paramObj
+     * @param $postArr
+     * @param $userInfo
      */
-    public function click()
+    private function sendClickMsg($paramObj, $postArr, $userInfo)
     {
-        // TODO: Implement click() method.
-        $this->text('这个是用户点击事件~'. json_encode($this->config));
+        $type = 2;
+        try {
+            $keywordInfo = DoctorWxMenu::where(['name' => trim($postArr['EventKey'])])
+                ->order('id desc')
+                ->limit(1)
+                ->find();
+            if (!empty($keywordInfo)) {
+                if ($keywordInfo['ctype'] == 1 and !empty($keywordInfo['click_img'])) {
+                    $paramObj['title'] = isset($keywordInfo['name']) ? '' : $keywordInfo['name'];
+                    $paramObj['content'] = isset($keywordInfo['click_content']) ? '' : $keywordInfo['click_content'] . json_encode($userInfo);
+                    $paramObj['imgurl'] = isset($keywordInfo['click_img']) ? '' : $keywordInfo['click_img'];
+                    $paramObj['jumpurl'] = isset($keywordInfo['click_url']) ? '' : $keywordInfo['click_url'];
+                    $type = $keywordInfo['ctype'] == 1 and !empty($keywordInfo['click_img']) ? 1 : 2;
+                } else {
+                    $paramObj['content'] = '谢谢您的关心陪伴，系统升级中，给你带来的不便请见谅，爱你，么么哒~' . json_encode($userInfo);
+                }
+                Send::keyWord($paramObj, $postArr, $type);
+            }
+        } catch (\Exception $exception) {
+            $paramObj['content'] = '谢谢您的关心陪伴，系统升级中，给你带来的不便请见谅，爱你，么么哒~' . json_encode($userInfo);
+            Send::keyWord($paramObj, $postArr, $type);
+        }
     }
-
-    /**
-     * 扫码商品事件
-     * @return mixed|void
-     */
-    public function scanProduct()
-    {
-        // TODO: Implement scanProduct() method.
-        $this->text('用户商品扫码' . json_encode($this->config));
-    }
-
-    /**
-     * 扫码事件
-     * @return mixed|void
-     */
-    public function scan()
-    {
-        // TODO: Implement scan() method.
-        $this->text('扫码进入' . json_encode($this->config));
-    }
-
-    /**
-     * 用户输入
-     * @return mixed|void
-     */
-    public function input()
-    {
-        // TODO: Implement input() method.
-        $this->text('用户输入' . json_encode($this->config));
-    }
-
 
     /**
      * 用户操作方法
@@ -212,37 +240,17 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
      * @param \WeChat\Core\Authorize->config 微信数据包
      * @return mixed
      */
-    final public function handle()
+    public function handle()
     {
         // TODO: Implement handle() method.
-        $params = explode('_', trim($this->config['EventKey'])); // 扫码参数
-        switch ($this->config['Event']) {
-            case $this->config['Event'] == 'subscribe' and !isset($params[1]):  // 搜索公众号或推荐公众号关注
-                $this->follow();
-                break;
-            case $this->config['Event'] == 'subscribe' and isset($params[1]): // 扫码关注
-                $this->scanFollow();
-                break;
-            case 'user_scan_product_enter_session': // 用户商品扫码
-                $this->scanProduct();
-                break;
-            case 'CLICK': // 用户点击事件
-                $this->click();
-                break;
-            case 'SCAN': // 扫码进入
-                $this->scan();
-                break;
-        }
-        if (!empty(trim($this->config['Content']))){ // 用户输入
-            $this->input();
-        }
     }
+
 
     /**
      * 发送文本消息
      * @param string $content 回复的文本内容
      */
-    final protected function text(string $content = '这是个友好的回复~')
+    protected function text(string $content = '这是个友好的回复~')
     {
         $this->returnData['MsgType'] = __FUNCTION__;
         $this->returnData['Content'] = $content;
@@ -252,7 +260,7 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
      * 发送图片消息
      * @param string $mediaId 素材ID
      */
-    final protected function image(string $mediaId)
+    protected function image(string $mediaId)
     {
         $this->returnData['MsgType'] = __FUNCTION__;
         $this->returnData['MediaId'] = $mediaId;
@@ -262,7 +270,7 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
      * 发送语音消息
      * @param string $mediaId 素材ID
      */
-    final protected function voice(string $mediaId)
+    protected function voice(string $mediaId)
     {
         $this->returnData['MsgType'] = __FUNCTION__;
         $this->returnData['MediaId'] = $mediaId;
@@ -274,7 +282,7 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
      * @param string $title 视频标题
      * @param string $description   视频消息的描述
      */
-    final protected function video(string $mediaId,string $title = '这是一个标题',string $description = '消息的描述')
+    protected function video(string $mediaId,string $title = '这是一个标题',string $description = '消息的描述')
     {
         $this->returnData['MsgType'] = __FUNCTION__;
         $this->returnData['MediaId'] = $mediaId;
@@ -284,16 +292,18 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
 
     /**
      * 发送音乐消息
-     * @param string $title 消息标题
-     * @param string $description   描述
-     * @param string $musicURL  音乐链接
-     * @param string $HQMusicUrl    高清音乐URL
-     * @param string $ThumbMediaId  缩略图的媒体id，通过素材管理中的接口上传多媒体文件，得到的id
+     * @param string $mediaId
+     * @param string $title
+     * @param string $description
+     * @param string $musicURL
+     * @param string $HQMusicUrl
+     * @param string $ThumbMediaId
      */
-    final protected function music(string $title = '这是一个标题',string $description = '消息的描述',
+    protected function music(string $mediaId,string $title = '这是一个标题',string $description = '消息的描述',
                              string $musicURL = '', string $HQMusicUrl = '', string $ThumbMediaId = '')
     {
         $this->returnData['MsgType'] = __FUNCTION__;
+        $this->returnData['MediaId'] = $mediaId;
         $this->returnData['Title'] = $title;
         $this->returnData['Description'] = $description;
         $this->returnData['MusicURL'] = $musicURL;
@@ -304,17 +314,9 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
 
     /**
      * 发送图文消息
-     * @param array $Articles 图文数组
-     * @format 格式 $Articles = array(
-                                    array(
-                                       'Title'=>'标题',
-                                      'Description'=>'注释',
-                                      'PicUrl'=>'图片地主（含域名的全路径:图片链接，支持JPG、PNG格式，较好的效果为大图360*200，小图200*200）',
-                                      'Url'=>'点击图文消息跳转链接'
-                                    ),
-                                );
+     * @param array $Articles
      */
-    final protected function news(array $Articles = [])
+    protected function news(array $Articles = [])
     {
         if (!isset($Articles[0]['Title'])) {
             echo '';

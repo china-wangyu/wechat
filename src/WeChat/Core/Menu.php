@@ -6,10 +6,6 @@
 namespace WeChat\Core;
 
 
-/**
- * Class Menu  微信菜单类
- * @package WeChat\Core
- */
 class Menu extends Base
 {
     // 获取菜单
@@ -20,39 +16,31 @@ class Menu extends Base
 
     /**
      * 获取菜单
-     * @inheritdoc 详细文档：https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141014
-     * @param string $accessToken
+     * @param string $token
      * @return array|bool
      */
-    public static function gain(string $accessToken)
+    public static function gain(string $token = '')
     {
+        // 验证微信普通token,没有就刷新
+        empty($accessToken) && $token = Token::gain();
+
         // 拼装获取菜单链接
-        $getMenuUrl = str_replace('ACCESS_TOKEN', $accessToken, static::$getMenuUrl);
+        $getMenuUrl = str_replace('ACCESS_TOKEN', $token, static::$getMenuUrl);
 
         // 发送获取菜单，获取结果
-        return self::get($getMenuUrl);
-    }
+        $result = self::get($getMenuUrl);
 
-    /**
-     * 删除菜单
-     * @inheritdoc 详细文档：https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141015
-     * @param string $accessToken
-     * @return array|bool
-     */
-    public static function delete(string $accessToken)
-    {
-        // 拼装获取菜单链接
-        $getMenuUrl = str_replace('ACCESS_TOKEN', $accessToken, static::$getMenuUrl);
-
-        // 发送获取菜单，获取结果
-        return self::get($getMenuUrl);
+        // 验证结果菜单
+        if ($result['errcode'] == 0) {
+            return $result;
+        } else {
+            return false;
+        }
     }
 
 
     /**
      * 设置菜单
-     * @inheritdoc 详细文档：https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141013
-     * @param string $accessToken
      * @param array $menu
         例如：$menu =[
                        [
@@ -60,9 +48,11 @@ class Menu extends Base
                             'name'=> '这是第一级button',
                             'list' => [
                                [
-                                    'type'=> 'view',
-                                    'name'=> '百度',
+                                    'type'=> 'miniprogram',
+                                    'name'=> 'xx小程序',
                                     'url' => 'http://www.baidu.com',
+                                    'appid' => 'asdasdas', 小程序APPID
+                                    'pagepath' => '/page/index/index', // 小程序页面链接
                                 ]
                             ],
                        ],
@@ -74,18 +64,20 @@ class Menu extends Base
                             'pagepath' => '/page/index/index', // 小程序页面链接
                         ]
                     ];
-
+     * @param string $token
      * @return array
      */
-    public static function set(string $accessToken, array $menu)
+    public static function set(array $menu, string $token = '')
     {
+        // 验证并获取微信普通token
+        empty($accessToken) && $accessToken = Token::gain();
         (!is_array($menu) or count($menu) < 1) && self::error('请设置正确的参数 $menu ~ !');
 
         // 组装参数
         $format_param['button'] = self::format($menu);
 
         // 替换token
-        $setMenuUrl = str_replace('ACCESS_TOKEN', $accessToken, static::$setMenuUrl);
+        $setMenuUrl = str_replace('ACCESS_TOKEN', $token, static::$setMenuUrl);
 
         // 生成菜单
         return self::post($setMenuUrl, json_encode($format_param, JSON_UNESCAPED_UNICODE));
