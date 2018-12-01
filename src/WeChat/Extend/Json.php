@@ -31,7 +31,6 @@ class Json extends \Exception
      * 请求成功
      * @param string $msg 返回消息
      * @param array $data 返回data数据
-     * @param array $options 多选主参数
      */
     public static function success(string $msg = '请求成功', array $data = [])
     {
