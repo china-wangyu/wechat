@@ -64,6 +64,10 @@ WeChat         模块目录
         
         ├─Menu.php               微信菜单
         
+        ├─Material.php           微信素材
+        
+        ├─Authorize.php          微信授权认证类
+        
 ├─ Extend         依赖目录
 
          ├─File.php                 文件存储类。
@@ -73,6 +77,10 @@ WeChat         模块目录
          ├─Request.php              curl请求封装类。
          
          ├─Tool.php              工具类。
+         
+├─ Lib            第三方目录
+         
+         ├─phpqrcode.php                 PHP生成二维码类。 
 ~~~
 
 
@@ -192,19 +200,14 @@ WeChat         模块目录
 ### 关键字推送 `keyWord`
 ~~~
 
-    * [keyWord 关键字回复]
-    * @param  array           $paramObj       [参数数组]
-    * @param  array           $postObj        [微信对象]
-    * @param  boolean         $template       [关键字模板 图文：true | 文本： false]
-    * @return [string|boolen] [description]
+     * 被动回复消息
+     * @param array $triggerConfig 微信消息对象
+     * @param array $triggerData   用户数据
+     
+    \WeChat\Core\Send::trigger($triggerConfig, $triggerData);
 
-    \WeChat\Core\Send::keyWord($paramObj = [], $postObj = [], $template = false);
-
-    例如：
-
-    $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', ExtendXML_NOCDATA);
-    $paramObj['content'] = '来啊~';
-    \WeChat\Core\Send::keyWord($paramObj, $postObj);
+    例如： 使用说明见Authorize类使用方法
+        
 ~~~
 
 
@@ -220,7 +223,7 @@ WeChat         模块目录
     * @param  string $topcolor   [微信top颜色]
     * @return [ajax] [boolen]
 
-    \WeChat\Core\Send::msg($accessToken = '', $templateid = '', $openid = '', $data = [], $url = '', $topcolor = '#FF0000');
+    \WeChat\Core\Send::msg($accessToken, $templateid, $openid, $data = [], $url = '', $topcolor = '#FF0000');
 ~~~
 
 ## 微信菜单 `Menu`
@@ -229,10 +232,10 @@ WeChat         模块目录
 ~~~
 
     * [gain 获取菜单]
-    * @param  string $accessToken [微信token]                              [菜单内容 ]
+    * @param  string $accessToken [微信token]
     * @return [array] [微信返回值：状态值数组]
 
-    \WeChat\Core\Menu::gain($accessToken = '', $menu = []);
+    \WeChat\Core\Menu::gain($accessToken);
 ~~~
 
 
@@ -242,19 +245,29 @@ WeChat         模块目录
     * [set 生成菜单]
     * @param  string $accessToken [微信token]
     * 例如：$menu =[
-    *     'menu_name'=> '掌上商城',
-    *     'menu_status'=> 0; //0表示view
-    *     'menu_url' => 'http://www.baidu.com',
-    *     'chind' => [
-    *         'menu_name'=> '掌上商城',
-    *         'menu_status'=> 0; //0表示view
-    *         'menu_url' => 'http://www.baidu.com',
-    *         ],
-    *     ];
+                    [
+                         'type'=> 'click', //
+                         'name'=> '这是第一级button',
+                         'list' => [
+                            [
+                                 'type'=> 'view',
+                                 'name'=> '百度',
+                                 'url' => 'http://www.baidu.com',
+                             ]
+                         ],
+                    ],
+                     [
+                         'type'=> 'miniprogram',
+                         'name'=> 'xx小程序',
+                         'url' => 'http://www.baidu.com',
+                         'appid' => 'asdasdas', 小程序APPID
+                         'pagepath' => '/page/index/index', // 小程序页面链接
+                     ]
+                 ];
     * @param  array   $menu                                  [菜单内容 ]
     * @return [array] [微信返回值：状态值数组]
 
-    \WeChat\Core\Menu::set( array $menu = [], $accessToken = '');
+    \WeChat\Core\Menu::set($accessToken, $menu);
 ~~~
 
 
@@ -263,50 +276,45 @@ WeChat         模块目录
 ### 微信带参二维码 `wechat`
 ~~~
 
-    /**
-     * 创建微信二维码生成
-     * @param string $accessToken 授权TOKEN
-     * @param string $scene_str 字符串
-     * @param string $scene_str_prefix  字符串前缀
-     * @return array|bool|string
-     */
-    \WeChat\Core\QrCode::wechat(string $accessToken,string $scene_str, string $scene_str_prefix = 'wene_')
+    * 创建微信带参二维码生成
+    * @inheritdoc 详细文档：https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1443433542
+    * @param string $accessToken 授权TOKEN
+    * @param string $scene_str 字符串
+    * @param string $scene_str_prefix 字符串前缀
+    * @param int $type 二维码类型：(小于等于1) = 有效时长30天  (大于等于2) = 永久
+    * @return array|bool|mixed
+    
+    \WeChat\Core\QrCode::wechat(string $accessToken,string $scene_str, string $scene_str_prefix = 'wene_', int $type = 1)
 ~~~
 
 
 ### 创建二维码 `create`
 ~~~
 
-     /**
-          * 生成二维码
-          * @param string|null $text  二维码内容 默认：
-          * @param string|null $label    二维码标签 默认：null
-          * @param string|null $filePath 二维码储存路径 默认：null
-          * @param string|null $logoPath 二维码设置logo 默认：null
-          * @param int $size     二维码宽度，默认：300
-          * @param int $margin   二维码点之间的间距 默认：10
-          * @param string $byName    生成图片的后缀名 默认：png格式
-          * @param string $encoding  编码语言，默认'UTF-8',基本不用更改
-          * @param array $foregroundColor    前景色
-          * @param array $backgroundColor    背景色
-          * @param int $logoWidth    二维码logo宽度
-          * @param int $logoHeight   二维码logo高度
-          * @return bool|string  返回值
-          * @throws \Endroid\QrCode\Exception\InvalidPathException
-          */
-         public static function create(string $text = '', string $label = null, string $filePath = null,
-                                       string $logoPath = null, int $size = 300, int $margin = 15, string $byName = 'png',
-                                       string $encoding = 'UTF-8',array $foregroundColor = ['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0],
-                                       array $backgroundColor = ['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0],
-                                       int $logoWidth = 100,int $logoHeight = 100)
+        * 生成二维码
+        * @inheritdoc 文档说明：http://phpqrcode.sourceforge.net/
+        * @param string $text 二维码内容
+        * @param bool $filePath    二维码储存路径
+        * @param string $level 二维码容错机制
+        * @param int $size 点大小
+        * @param int $margin   点间距
+        * @param bool $saveandprint    保存或打印
+        * @return string|void
+              
+        public static function create(string $text = '',
+                                     bool $filePath = false,
+                                     string $level = QR_ECLEVEL_L,
+                                     int $size = 6,
+                                     int $margin = 2,
+                                     bool $saveandprint=false)
                                        
-         使用方式：
-         
-            1. 生成二维码，但不生成二维码文件
-            $qrocde = \WeChat\Core\QrCode::create('二维码内容');
-            
-            2. 生成二维码文件
-            $qrocde = \WeChat\Core\QrCode::create('二维码内容','文件存放路径');
+        使用方式：
+        
+        1. 生成二维码，但不生成二维码文件
+        $qrocde = \WeChat\Core\QrCode::create('二维码内容');
+        
+        2. 生成二维码文件
+        $qrocde = \WeChat\Core\QrCode::create('二维码内容','文件存放路径');
 ~~~
 
 
@@ -322,6 +330,201 @@ WeChat         模块目录
     
     // 取值
     \WeChat\Extend\File::param('key');
+~~~
+
+
+## 微信素材类 `Material`
+###  获取素材总数 `getMaterialCount`
+~~~
+
+    * 获取素材总数
+    * @param string $access_token 普通授权token
+    * @return array
+    
+    \WeChat\Core\Material::getMaterialCount($access_token);
+~~~
+
+###  获取素材列表 `getMaterialCount`
+~~~
+
+    * 获取素材列表
+    * @param string $access_token 普通授权token
+    * @return array
+    
+    \WeChat\Core\Material::getMaterialList($access_token);
+~~~
+
+##  微信授权认证 `抽象` 类 `Authorize` 
+###  对接微信开发者模式 
+
+>    使用方式
+
+-  第一步：创建自己的微信开发者对接类继承   微信授权认证 `抽象` 类 `Authorize`
+
+~~~
+    <?php
+    
+    class Wechat extends \WeChat\Core\Authorize
+    {
+       /**
+        * 设置与微信对接的TOKEN凭证字符
+        * Authorize constructor.
+        * @param string $token 微信开发模式TOKEN字符串
+        * @param string $appID 微信appid
+        * @param string $appScret 微信appScret
+        * @inheritdoc 详细文档：https://mp.weixin.qq.com/advanced/advanced?action=dev&t=advanced/dev&token=1833550478&lang=zh_CN
+        */
+        public function __construct($token, $appID, $appScret)
+        {
+            parent::__construct($token);
+        }
+    }
+~~~ 
+
+-  第二步：重写微信事件方法和用户输入方法
+
+~~~
+
+    /**
+         * 首次关注事件
+         * @return mixed|void
+         */
+        public function follow()
+        {
+            // TODO: Implement follow() method.
+            $sendMsg = '首次关注，类型：搜索或朋友分享推荐';
+            $this->text($sendMsg);
+        }
+    
+        /**
+         * 扫码关注事件
+         * @return mixed|void
+         */
+        public function scanFollow()
+        {
+            // TODO: Implement scanFollow() method.
+            $this->text('扫码关注');
+        }
+    
+        /**
+         * 点击事件
+         * @return mixed|void
+         */
+        public function click()
+        {
+            // TODO: Implement click() method.
+            $this->text('这个是用户点击事件~');
+        }
+    
+        /**
+         * 扫码商品事件
+         * @return mixed|void
+         */
+        public function scanProduct()
+        {
+            // TODO: Implement scanProduct() method.
+            $this->text('用户商品扫码');
+        }
+    
+        /**
+         * 扫码事件
+         * @return mixed|void
+         */
+        public function scan()
+        {
+            // TODO: Implement scan() method.
+            $this->text('扫码进入');
+        }
+    
+        /**
+         * 用户输入
+         * @return mixed|void
+         */
+        public function input()
+        {
+            // TODO: Implement input() method.
+            $this->text('用户输入' );
+        }
+~~~
+
+###  可返回消息的模板和方法简介
+
+> 只在继承微信开发者模式对接类`Authorize`里面使用
+
+- 推送文本消息 `text`
+
+~~~
+    
+    * 发送文本消息
+    * @param string $content 回复的文本内容
+    
+    $this->text($content);
+~~~
+
+- 推送图片消息 `image`
+
+~~~
+    
+    * 发送图片消息
+    * @param string $mediaId 素材ID
+    
+    $this->image($mediaId)
+~~~
+
+- 推送音频消息 `voice`
+
+~~~
+    
+    * 发送语音消息
+    * @param string $mediaId 素材ID
+    
+    $this->voice($mediaId)
+~~~
+
+- 推送视频消息 `video`
+
+~~~
+    
+    * 发送视频消息
+    * @param string $mediaId 素材ID
+    * @param string $title 视频标题
+    * @param string $description   视频消息的描述
+    
+    $this->video($mediaId, $title, $description)
+~~~
+
+- 推送音乐消息 `music`
+
+~~~
+    
+    * 发送音乐消息
+    * @param string $title 消息标题
+    * @param string $description   描述
+    * @param string $musicURL  音乐链接
+    * @param string $HQMusicUrl    高清音乐URL
+    * @param string $ThumbMediaId  缩略图的媒体id，通过素材管理中的接口上传多媒体文件，得到的id
+    
+    $this->music( $title, $description, $musicURL, $HQMusicUrl, $ThumbMediaId )
+~~~
+
+- 推送图文消息 `news`
+
+~~~
+    
+    /**
+     * 发送图文消息
+     * @param array $Articles 图文数组
+     * @format 格式 $Articles = array(
+                                    array(
+                                       'Title'=>'标题',
+                                      'Description'=>'注释',
+                                      'PicUrl'=>'图片地主（含域名的全路径:图片链接，支持JPG、PNG格式，较好的效果为大图360*200，小图200*200）',
+                                      'Url'=>'点击图文消息跳转链接'
+                                    ),
+                                );
+     */
+    
+    $this->news($Articles)
 ~~~
 
 
