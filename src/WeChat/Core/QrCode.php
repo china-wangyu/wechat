@@ -48,7 +48,6 @@ class QrCode extends Base
             }
              return \QRcode::png($text,$filePath,$level,$size,$margin,$saveandprint);
         } catch (\WeChat\Extend\Json $exception) {
-            var_dump($exception);die;
             return $exception->getMessage();
         }
 
@@ -90,7 +89,7 @@ class QrCode extends Base
             // 获取对应数据
             $result = self::post($setQrCodeUrl, $qrCodeParam);
             if (isset($result['ticket'])) {
-                $result = str_replace('JSAPI_TICKET',$result['ticket'],static::$showqrcodeUrl);
+                $result['showUrl'] = str_replace('JSAPI_TICKET',$result['ticket'],static::$showqrcodeUrl);
             }
         }
         // 返回结果

@@ -66,9 +66,10 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
      */
     public function __construct(string $token,string $appID,string $appScret)
     {
+        // 这里填写的是你在微信上设置的TOKEN，但是必须保证与微信公众平台-接口配置信息一致
         if (!empty($token)) $this->token = $token;
-        if (!empty($appID)) $this->appid = $token;
-        if (!empty($appScret)) $this->appSecret = $token;
+        if (!empty($appID)) $this->appid = $appID;
+        if (!empty($appScret)) $this->appSecret = $appScret;
     }
 
     /**
@@ -76,11 +77,8 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
      */
     final public function index()
     {
-        // 这里填写的是你在微信上设置的TOKEN，但是必须保证与微信公众平台-接口配置信息一致
-        $echoStr = $_REQUEST['echostr'];
-
         // 验证数据或回复用户
-        (!isset($echoStr)) ? $this->responseMsg() : $this->valid();
+        (!isset($_REQUEST['echostr'])) ? $this->responseMsg() : $this->valid();
     }
 
     /**
@@ -101,10 +99,10 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
      */
     final protected function checkSignature()
     {
-        $tmpArr = array($this->token, trim($_REQUEST['timestamp']), trim($_REQUEST['nonce']));
+        $tmpArr = array($this->token, $_REQUEST['timestamp'], $_REQUEST['nonce']);
         sort($tmpArr);
         $tmpStr = sha1(implode($tmpArr));
-        return ($tmpStr == trim($_REQUEST['signature'])) ? true: false;
+        return ($tmpStr == $_REQUEST['signature']) ? true: false;
     }
 
     /**
@@ -123,8 +121,11 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
                 // 普通授权token
                 $resToken = Token::gain($this->appid, $this->appSecret);
 
-                // 微信用户信息
-                $this->userInfo = User::newUserInfo($resToken, $this->config['FromUserName']);
+                $this->userInfo  = [];
+                if (isset($resToken['access_token'])){
+                    // 微信用户信息
+                    $this->userInfo = User::newUserInfo($resToken['access_token'], $this->config['FromUserName']);
+                }
 
                 // 逻辑操作，需要更改逻辑的就在这个方法咯~
                 $this->handle();
@@ -132,7 +133,9 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
                 // 被动发送消息
                 Send::trigger($this->config,$this->returnData);
             }
-        }catch (\Exception $exception){}
+        }catch (\Exception $exception){
+            $this->text($exception->getMessage());
+        }
         echo '';
         exit;
     }
@@ -144,14 +147,7 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
     public function follow()
     {
         // TODO: Implement follow() method.
-        $sendMsg = '您好，感谢您关注都汇康健
-
-都汇康健是国内领先的大健康管理及慢病教育运营商，为广大亚健康人群
-及慢病人群提供优质的健康管理服务和慢病教育服务。
-
-我们在体重管理、睡眠管理、健脑益智、心脑血管等众多领域为国人提供专业的医学教育及科普服务，通过系统的慢病解决方案及专业的医学级健康产品，持续为广大国人创造健康价值，提升生活品质。
-
-健康管理咨询：400-870-9690';
+        $sendMsg = '您好，感谢您关注,爱你么么哒~';
         $this->text($sendMsg);
     }
 
@@ -215,26 +211,25 @@ abstract class Authorize extends Base implements \WeChat\Extend\Authorize
     final public function handle()
     {
         // TODO: Implement handle() method.
-        $params = explode('_', trim($this->config['EventKey'])); // 扫码参数
-        switch ($this->config['Event']) {
-            case $this->config['Event'] == 'subscribe' and !isset($params[1]):  // 搜索公众号或推荐公众号关注
-                $this->follow();
+        switch ($this->config['MsgType']){
+            case $this->config['MsgType'] =='text':
+                $this->input();
                 break;
-            case $this->config['Event'] == 'subscribe' and isset($params[1]): // 扫码关注
-                $this->scanFollow();
+            case $this->config['Event'] == 'subscribe' :
+                $params = explode('_', trim($this->config['EventKey'])); // 扫码参数
+                !isset($params[1]) ?
+                    $this->follow() : // 搜索公众号或推荐公众号关注
+                    $this->scanFollow(); // 扫码关注
                 break;
-            case 'user_scan_product_enter_session': // 用户商品扫码
+            case $this->config['Event'] == 'user_scan_product_enter_session': // 用户商品扫码
                 $this->scanProduct();
                 break;
-            case 'CLICK': // 用户点击事件
+            case $this->config['Event'] == 'CLICK': // 用户点击事件
                 $this->click();
                 break;
-            case 'SCAN': // 扫码进入
+            case $this->config['Event'] == 'SCAN': // 扫码进入
                 $this->scan();
                 break;
-        }
-        if (!empty(trim($this->config['Content']))){ // 用户输入
-            $this->input();
         }
     }
 

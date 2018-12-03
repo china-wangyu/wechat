@@ -22,7 +22,7 @@ class Ticket extends Base
     public static function gain(string $accessToken)
     {
         $param = \WeChat\Extend\File::param('ticket');
-        if ($param === null or (isset($param['time']) and time() - $param['time'] > 7150)) {
+        if ($param === null or empty($param)) {
 
             // 准备数据
             static::$getTicketUrl = str_replace('ACCESS_TOKEN',$accessToken,static::$getTicketUrl);
@@ -30,7 +30,7 @@ class Ticket extends Base
 
             // 返回数据
             isset($result['ticket']) && \WeChat\Extend\File::param('ticket', $result);
-            return $result['ticket'];
+            return $result;
         } else {
             return $param['ticket'];
         }

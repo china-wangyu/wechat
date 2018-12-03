@@ -27,24 +27,18 @@ class File
     {
         $file_path = self::mkdir('param');
         $fileCont = json_decode(file_get_contents($file_path), true);
-        switch ($fileCont) {
-            case empty($fileCont) and empty($val):
-                return null;
-                break;
-            case isset($fileCont[$var]) and !empty($val):
-                $val['time'] = time();
-                $fileCont[$var] = $val;
-                file_put_contents($file_path, json_encode($fileCont));
-                break;
-            case isset($fileCont[$var]) and empty($val):
-                $returnObj = $fileCont[$var];
-                return $returnObj['time'] - time() <= 7100 ? $returnObj : null;
-                break;
-            case !isset($fileCont[$var]) and !empty($val):
-                $val['time'] = time();
-                $fileCont[$var] = $val;
-                file_put_contents($file_path,json_encode($fileCont));
-                break;
+        if(empty($fileCont) and empty($val)) return null;
+        if(!empty($val) and !empty($var)){
+            $val['time'] = time();
+            $fileCont[$var] = $val;
+            file_put_contents($file_path,json_encode($fileCont));
+        }
+        if(!empty($val) and empty($var)){
+            if ($fileCont[$var]['time'] - time() <= 7100){
+                unset($fileCont[$var]['time']);
+                if (!empty($fileCont[$var])) return $fileCont[$var];
+            }
+            return null;
         }
     }
 
@@ -65,6 +59,7 @@ class File
     }
 
 
+
     /**
      * 创建日志类型文件
      * @param string $type
@@ -73,14 +68,14 @@ class File
     private static function mkdir(string $type = 'param')
     {
         $file_dir = dirname(__FILE__) . static::$ext . 'log' ;
-        (!is_dir($file_dir)) && mkdir($file_dir, 0777);
+        (!is_dir($file_dir)) && mkdir($file_dir, 0755);
         $file_dir .=  static::$ext . date('Y-m-d-H') . static::$ext;
         if ($type == 'param') {
             $file_dir = dirname(__FILE__) . static::$ext . 'log' . static::$ext . 'param' . static::$ext;
         }
 
         $file_name = $type . '.log';
-        (!is_dir($file_dir)) && mkdir($file_dir, 0777);
+        (!is_dir($file_dir)) && mkdir($file_dir, 0755);
 
         if (!is_file($file_dir . $file_name)) {
             file_put_contents($file_dir . $file_name, '');

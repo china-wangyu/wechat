@@ -5,6 +5,7 @@
 
 namespace WeChat\Core;
 
+
 /**
  * Class WxSend 微信推送类
  * @package wechat
@@ -24,32 +25,35 @@ class Send extends Base
     protected static $triggerTemplate;
 
     // 被动回复消息模板公共部分
-    protected static $triggerTemplateStart = '<ToUserName>< ![CDATA[toUser] ]></ToUserName>
-                                                <FromUserName>< ![CDATA[fromUser] ]></FromUserName>
-                                                <CreateTime>12345678</CreateTime>
-                                                <MsgType>< ![CDATA[news] ]></MsgType>';
+    protected static $triggerTemplateStart = '<ToUserName><![CDATA[%s]]></ToUserName>
+                  <FromUserName><![CDATA[%s]]></FromUserName>
+                  <CreateTime>%s</CreateTime>
+                  <MsgType><![CDATA[%s]]></MsgType>';
 
     /**
      * 被动回复消息
-     * @param array $triggerConfig  微信消息对象
-     * @param array $triggerData    用户数据
+     * @param array $triggerConfig 微信消息对象
+     * @param array $triggerData 用户数据
      * @throws \Exception
      */
-    public static function trigger(array $triggerConfig = [],array $triggerData = [])
+    public static function trigger(array $triggerConfig = [], array $triggerData = [])
     {
         static::$triggerConfig = $triggerConfig;
         static::$triggerData = $triggerData;
-        try{
+
+        try {
             static::$triggerTemplateStart = sprintf(static::$triggerTemplateStart, static::$triggerConfig['FromUserName'], static::$triggerConfig['ToUserName'],
-                time(), $triggerData['MsgType']);
+                time(), static::$triggerData['MsgType']);
             static::setTriggerMsgTemplate();
-            echo static::$triggerTemplate;die;
-        }catch (\Exception $exception){
+            echo static::$triggerTemplate;
+            die;
+        } catch (\Exception $exception) {
             static::$triggerTemplateStart = sprintf(static::$triggerTemplateStart, static::$triggerConfig['FromUserName'], static::$triggerConfig['ToUserName'],
                 time(), 'text');
             static::$triggerData['Content'] = $exception->getMessage();
             static::setTriggerMsgTemplate();
-            echo static::$triggerTemplate;die;
+            echo static::$triggerTemplate;
+            die;
         }
     }
 
@@ -129,8 +133,9 @@ class Send extends Base
      */
     private static function setTriggerTextMsgTemplate()
     {
-        $msgTemplate =  '<Content><![CDATA['.static::$triggerData['Content'].']]></Content><FuncFlag>0</FuncFlag>';
-        static::$triggerTemplate = '<xml>'.static::$triggerTemplateStart.$msgTemplate.'</xml>';
+        $msgTemplate = '<Content><![CDATA[%s]]></Content><FuncFlag>0</FuncFlag>';
+        static::$triggerTemplate = '<xml>' . static::$triggerTemplateStart . $msgTemplate . '</xml>';
+        static::$triggerTemplate = sprintf(static::$triggerTemplate, static::$triggerData['Content']);
     }
 
     /**
@@ -139,8 +144,9 @@ class Send extends Base
      */
     private static function setTriggerImageMsgTemplate()
     {
-        $msgTemplate =  '<Image><MediaId>< ![CDATA['.static::$triggerData['MediaId'].']]></MediaId></Image>';
-        static::$triggerTemplate = '<xml>'.static::$triggerTemplateStart.$msgTemplate.'</xml>';
+        $msgTemplate = '<Image><MediaId><![CDATA[%s]]></MediaId></Image>';
+        static::$triggerTemplate = '<xml>' . static::$triggerTemplateStart . $msgTemplate . '</xml>';
+        static::$triggerTemplate = sprintf(static::$triggerTemplate, static::$triggerData['MediaId']);
     }
 
     /**
@@ -149,8 +155,9 @@ class Send extends Base
      */
     private static function setTriggerVoiceMsgTemplate()
     {
-        $msgTemplate =  '<Voice><MediaId>< ![CDATA['.static::$triggerData['MediaId'].']]></MediaId></Voice>';
-        static::$triggerTemplate = '<xml>'.static::$triggerTemplateStart.$msgTemplate.'</xml>';
+        $msgTemplate = '<Voice><MediaId>< ![CDATA[%s]]></MediaId></Voice>';
+        static::$triggerTemplate = '<xml>' . static::$triggerTemplateStart . $msgTemplate . '</xml>';
+        static::$triggerTemplate = sprintf(static::$triggerTemplate, static::$triggerData['MediaId']);
     }
 
     /**
@@ -159,12 +166,9 @@ class Send extends Base
      */
     private static function setTriggerVideoMsgTemplate()
     {
-        $msgTemplate =  '<Video>
-                        <MediaId>< ![CDATA['.static::$triggerData['MediaId'].'] ]></MediaId>
-                        <Title>< ![CDATA['.static::$triggerData['Title'].'] ]></Title>
-                        <Description>< ![CDATA['.static::$triggerData['Description'].'] ]></Description>
-                        </Video>';
-        static::$triggerTemplate = '<xml>'.static::$triggerTemplateStart.$msgTemplate.'</xml>';
+        $msgTemplate = '<Video><MediaId><![CDATA[%s]]></MediaId><Title><![CDATA[%s]]></Title><Description><![CDATA[%s]]></Description></Video>';
+        static::$triggerTemplate = '<xml>' . static::$triggerTemplateStart . $msgTemplate . '</xml>';
+        static::$triggerTemplate = sprintf(static::$triggerTemplate, static::$triggerData['MediaId'], static::$triggerData['Title'], static::$triggerData['Description']);
     }
 
     /**
@@ -173,14 +177,16 @@ class Send extends Base
      */
     private static function setTriggerMusicMsgTemplate()
     {
-        $msgTemplate =  '<Music>
-                        <Title>< ![CDATA['.static::$triggerData['Title'].'] ]></Title>
-                        <Description>< ![CDATA['.static::$triggerData['Description'].'] ]></Description>
-                        <MusicUrl>< ![CDATA['.static::$triggerData['MusicUrl'].'] ]></MusicUrl>
-                        <HQMusicUrl>< ![CDATA['.static::$triggerData['HQMusicUrl'].'] ]></HQMusicUrl>
-                        <ThumbMediaId>< ![CDATA['.static::$triggerData['ThumbMediaId'].'] ]></ThumbMediaId>
+        $msgTemplate = '<Music>
+                        <Title><![CDATA[%s]]></Title>
+                        <Description><![CDATA[%s]]></Description>
+                        <MusicUrl><![CDATA[%s]]></MusicUrl>
+                        <HQMusicUrl><![CDATA[%s]]></HQMusicUrl>
+                        <ThumbMediaId><![CDATA[%s]]></ThumbMediaId>
                         </Music>';
-        static::$triggerTemplate = '<xml>'.static::$triggerTemplateStart.$msgTemplate.'</xml>';
+        static::$triggerTemplate = '<xml>' . static::$triggerTemplateStart . $msgTemplate . '</xml>';
+        static::$triggerTemplate = sprintf(static::$triggerTemplate, static::$triggerData['Title'], static::$triggerData['Description'],
+            static::$triggerData['MusicUrl'], static::$triggerData['HQMusicUrl'], static::$triggerData['ThumbMediaId']);
     }
 
     /**
@@ -191,22 +197,24 @@ class Send extends Base
     {
         $newCount = count(static::$triggerData['Articles']);
         if ($newCount < 1) throw new \Exception('图文消息发送失败，请检查数据结构~');
-        try{
-            $msgTemplate =  "<ArticleCount>'.$newCount.'</ArticleCount>";
-            $msgTemplate .=  "<Articles>";
-            foreach (static::$triggerData['Articles'] as $article)
-            {
-                $msgTemplate .=  '<item>
-                                  <Title><![CDATA['.$article['Title'].']]></Title>
-                                  <Description><![CDATA['.$article['Description'].']]></Description>
-                                  <PicUrl><![CDATA['.$article['PicUrl'].']]></PicUrl>
-                                  <Url><![CDATA['.$article['Url'].']]></Url>
+        try {
+            $msgTemplate = "<ArticleCount>'.$newCount.'</ArticleCount>";
+            $msgTemplate .= "<Articles>";
+            foreach (static::$triggerData['Articles'] as $article) {
+                $msgTemplate .= '<item>
+                                  <Title><![CDATA[%s]]></Title>
+                                  <Description><![CDATA[%s]]></Description>
+                                  <PicUrl><![CDATA[%s]]></PicUrl>
+                                  <Url><![CDATA[%s]]></Url>
                                   </item>';
+                $msgTemplate = sprintf($msgTemplate, $article['Title'], $article['Description'],
+                    $article['PicUrl'], $article['Url']);
             }
+
             $msgTemplate .= '</Articles>';
-            static::$triggerTemplate = '<xml>'.static::$triggerTemplateStart.$msgTemplate.'</xml>';
-        }catch (\Exception $exception){
-            throw new \Exception('图文消息发送失败，错误信息：'.$exception->getMessage());
+            static::$triggerTemplate = '<xml>' . static::$triggerTemplateStart . $msgTemplate . '</xml>';
+        } catch (\Exception $exception) {
+            throw new \Exception('图文消息发送失败，错误信息：' . $exception->getMessage());
         }
 
     }

@@ -30,16 +30,17 @@ class Token extends Base
             }
 
             // 获取参数验证规则
-            if (strlen(trim($appid)) != 18 or strlen(trim($appSecret)) != 18) {
+            if (strlen(trim($appid)) != 18 or strlen(trim($appSecret)) != 32) {
                 self::error('请设置正确格式的微信公众号开发者APPID 和 APPSECRET~ !');
             }
+
             // 准备数据
             static::$getTokenUrl = str_replace('APPID', $appid, static::$getTokenUrl);
             static::$getTokenUrl = str_replace('APPSECRET', $appSecret, static::$getTokenUrl);
 
             // 返回结果
             $result = self::get(static::$getTokenUrl);
-            $result['errcode'] == 0 &&  \WeChat\Extend\File::param('access_token', $result);
+            isset($result['access_token']) &&  \WeChat\Extend\File::param('access_token', $result);
             return $result;
         } else {
             return $param['access_token'];

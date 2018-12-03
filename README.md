@@ -155,6 +155,18 @@ WeChat         模块目录
     * @return [string] [微信access_token]
 
     \WeChat\Core\Token::gain('微信appid', '微信appSecret');  # 获取微信access_token
+    
+    成功：
+            array{
+                'access_token'=>'**************************************',
+                'expires_in'=> ****,
+            }
+            
+    失败：
+        array{
+                    'errormsg'=>'*************',
+                    'errorcode'=> ***,
+                }
 ~~~
 
 
@@ -179,6 +191,21 @@ WeChat         模块目录
     * @return [array]  [微信JSDK]
 
     \WeChat\Core\Ticket::sign('微信jsapi_ticket');
+    
+    成功：
+        array{
+            "errcode"=>0,
+            "errmsg"=>"ok",
+            "ticket"=>"kgt8ON7yVITDhtdwci0qeQM5xOrtZmRriogQ-yl-zBNBoXs56JmAWkbJVY68uajNBIIR4xa5t_dx9W0X6a-tnQ",
+            "expires_in"=>7200,
+            "time"=>1543832364
+        }
+            
+    失败：
+        array{
+            'errormsg'=>'*************',
+            'errorcode'=> ***,
+        }
 ~~~
 
 
@@ -285,6 +312,20 @@ WeChat         模块目录
     * @return array|bool|mixed
     
     \WeChat\Core\QrCode::wechat(string $accessToken,string $scene_str, string $scene_str_prefix = 'wene_', int $type = 1)
+    
+    成功：
+        array(4) {
+          ["ticket"] => string(96) "ticket字符串"
+          ["expire_seconds"] => int('时长')
+          ["url"] => string(45) "二维码内容"
+          ["showUrl"] => string(147) "在线地址"
+        }
+        
+    失败：
+        array{
+            'errormsg'=>'*************',
+            'errorcode'=> ***,
+        }
 ~~~
 
 
@@ -376,7 +417,7 @@ WeChat         模块目录
         */
         public function __construct($token, $appID, $appScret)
         {
-            parent::__construct($token);
+            parent::__construct($token, $appID, $appScret);
         }
     }
 ~~~ 
@@ -445,6 +486,14 @@ WeChat         模块目录
             // TODO: Implement input() method.
             $this->text('用户输入' );
         }
+~~~
+
+###  可返回消息的模板和方法简介
+
+> 只在继承微信开发者模式对接类`Authorize`里面使用
+
+~~~
+    $this->userInfo;  // 微信用户信息。
 ~~~
 
 ###  可返回消息的模板和方法简介
