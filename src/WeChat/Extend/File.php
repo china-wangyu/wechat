@@ -33,10 +33,10 @@ class File
             $fileCont[$var] = $val;
             file_put_contents($file_path,json_encode($fileCont));
         }
-        if(!empty($val) and empty($var)){
+        if(empty($val) and !empty($var)){
             if ($fileCont[$var]['time'] - time() <= 7100){
                 unset($fileCont[$var]['time']);
-                if (!empty($fileCont[$var])) return $fileCont[$var];
+                if (isset($fileCont[$var])) return $fileCont[$var];
             }
             return null;
         }
