@@ -17,7 +17,7 @@
 
 ~~~
 
-    码云   ：git@github.com:china-wangyu/WeChat.git
+    码云   ：git@github.com:china-wangyu/wechat.git
 
 ~~~
 
@@ -32,7 +32,7 @@
 #### 使用： 在composer.json添加
 
     "require": {
-        "china-wangyu/WeChat": "^1.0.0"
+        "china-wangyu/wechat": "^1.0.0"
     },
 
 #### 然后(命令行)：

@@ -19,24 +19,24 @@ class File
 
     /**
      * 存储对象文件，可扩展
-     * @param string $var
-     * @param array $val
+     * @param string $key
+     * @param array $value
      * @return null
      */
-    public static function param(string $var, array $val = [])
+    public static function param(string $key, array $value = [])
     {
         $file_path = self::mkdir('param');
         $fileCont = json_decode(file_get_contents($file_path), true);
-        if(empty($fileCont) and empty($val)) return null;
-        if(!empty($val) and !empty($var)){
-            $val['time'] = time();
-            $fileCont[$var] = $val;
-            file_put_contents($file_path,json_encode($fileCont));
+        if (empty($fileCont) and empty($value)) return null;
+        if (!empty($value) and !empty($key)) {
+            $value['time'] = time();
+            $fileCont[$key] = $value;
+            file_put_contents($file_path, json_encode($fileCont));
         }
-        if(!empty($val) and empty($var)){
-            if ($fileCont[$var]['time'] - time() <= 7100){
-                unset($fileCont[$var]['time']);
-                if (!empty($fileCont[$var])) return $fileCont[$var];
+        if (!empty($key) and empty($value)) {
+            if ($fileCont[$key]['time'] - time() <= 7100) {
+                unset($fileCont[$key]['time']);
+                if (!empty($fileCont[$key])) return $fileCont[$key];
             }
             return null;
         }
@@ -54,10 +54,9 @@ class File
         if (!empty($type) and empty($param)) {
             return json_decode(file_get_contents($file_path), true);
         }
-        $data = '['.date('Y-m-d H:i:s').'] => '.json_encode($param) . PHP_EOL;
+        $data = '[' . date('Y-m-d H:i:s') . '] => ' . json_encode($param) . PHP_EOL;
         file_put_contents($file_path, $data, FILE_APPEND);
     }
-
 
 
     /**
@@ -67,9 +66,9 @@ class File
      */
     private static function mkdir(string $type = 'param')
     {
-        $file_dir = dirname(__FILE__) . static::$ext . 'log' ;
+        $file_dir = dirname(__FILE__) . static::$ext . 'log';
         (!is_dir($file_dir)) && mkdir($file_dir, 0755);
-        $file_dir .=  static::$ext . date('Y-m-d-H') . static::$ext;
+        $file_dir .= static::$ext . date('Y-m-d-H') . static::$ext;
         if ($type == 'param') {
             $file_dir = dirname(__FILE__) . static::$ext . 'log' . static::$ext . 'param' . static::$ext;
         }
